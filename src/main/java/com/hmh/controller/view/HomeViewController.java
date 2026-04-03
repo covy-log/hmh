@@ -1,5 +1,6 @@
 package com.hmh.controller.view;
 
+import com.hmh.service.RoutineService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -7,9 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-@RequiredArgsConstructor // final이 붙은 필드의 생성자를 자동으로 만들어줌(생성자 주입)
-public class DashboardViewController {
+@RequiredArgsConstructor
+public class HomeViewController {
 
+    private final RoutineService routineService;
 
     /**
      * 첫 페이지 접속 시 분기 처리
@@ -19,20 +21,41 @@ public class DashboardViewController {
         HttpSession session = request.getSession(false);
 
         // 세션이 없거나 로그인 정보가 없으면 로그인 페이지로 리다이렉트
+
         if (session == null || session.getAttribute("LOGIN_MEMBER") == null) {
-            return "redirect:member/login";
+            return "member/login";
         }
 
-        // 로그인 되어 있으면 대시보드 페이지로 리다이렉트
-        return "redirect:/dashboard";
+        return "dailyLog";
     }
 
     /**
-     * 대시보드 페이지 이동 (타임리프: src/main/resources/templates/dashboard.html)
-     * (이 경로는 인터셉터가 보호하고 있으므로 무조건 로그인된 사람만 들어올 수 있음)
+     * 일일 루틴 페이지 이동
      */
-    @GetMapping("/dashboard")
-    public String dashboardPage() {
-        return "dashboard";
+    @GetMapping("/dailyLog")
+    public String dailyLogPage() {
+
+
+        return "dailyLog";
+    }
+
+    /**
+     * 루틴 현황 페이지 이동
+     */
+    @GetMapping("/routineCycleStatus")
+    public String routineCycleStatusPage() {
+
+
+        return "routineCycleStatus";
+    }
+
+    /**
+     * 목표 설정 페이지 이동
+     */
+    @GetMapping("/routineSetting")
+    public String routineSettingPage() {
+
+
+        return "routineSetting";
     }
 }

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>목표 설정</title>
+    <style>
+        /* 표를 깔끔하게 보기 위한 최소한의 스타일 */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; width: 150px; }
+        .hidden { display: none; }
+        /* 탭 버튼 스타일 (선택사항이지만 깔끔하게 보이도록 추가) */
+        button { padding: 8px 15px; margin-right: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div>
+    <button type="button" onclick="location.href='/dailyLog'">일일 루틴</button>
+    <button type="button" onclick="location.href='/routineCycleStatus'">루틴 현황</button>
+    <button type="button" style="font-weight: bold;">목표 설정</button>
+</div>
+
+<hr>
+
+<h2>새로운 목표 등록</h2>
+
+<table>
+    <tbody>
+    <tr>
+        <th>루틴명</th>
+        <td><input type="text" id="routineName" placeholder="예: 아침 조깅"></td>
+    </tr>
+    <tr>
+        <th>루틴 타입</th>
+        <td>
+            <select id="routineType" onchange="handleTypeChange()">
+                <option value="CHECK">단순체크</option>
+                <option value="COUNT">횟수</option>
+                <option value="TIME">시간</option>
+                <option value="DISTANCE">km</option>
+            </select>
+        </td>
+    </tr>
+    <tr id="targetValueRow" class="hidden">
+        <th>목표 수치</th>
+        <td><input type="number" id="targetValue" placeholder="숫자 입력"></td>
+    </tr>
+    <tr>
+        <th>반복 주기</th>
+        <td>
+            <div id="checkRepeatArea">
+                <input type="number" id="repeatWeeks" value="1" style="width: 50px;"> 주 간격으로 반복
+            </div>
+            <div id="otherRepeatArea" class="hidden">
+                매주 (기본값)
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <th>수행 요일</th>
+        <td>
+            <label><input type="checkbox" id="checkAllDays" onclick="toggleAllDays()"> 매일</label> |
+            <label><input type="checkbox" class="day-checkbox" value="MON" onclick="updateAllDaysCheckbox()"> 월</label>
+            <label><input type="checkbox" class="day-checkbox" value="TUE" onclick="updateAllDaysCheckbox()"> 화</label>
+            <label><input type="checkbox" class="day-checkbox" value="WED" onclick="updateAllDaysCheckbox()"> 수</label>
+            <label><input type="checkbox" class="day-checkbox" value="THU" onclick="updateAllDaysCheckbox()"> 목</label>
+            <label><input type="checkbox" class="day-checkbox" value="FRI" onclick="updateAllDaysCheckbox()"> 금</label>
+            <label><input type="checkbox" class="day-checkbox" value="SAT" onclick="updateAllDaysCheckbox()"> 토</label>
+            <label><input type="checkbox" class="day-checkbox" value="SUN" onclick="updateAllDaysCheckbox()"> 일</label>
+        </td>
+    </tr>
+    <tr>
+        <th>시작 주 선택</th>
+        <td>
+            <input type="week" id="startWeek">
+            <span style="font-size: 0.8em; color: gray;">*기본값: 이번 주</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<button type="button" onclick="saveRoutine()" style="padding: 10px 20px; cursor: pointer;">목표 등록하기</button>
+
+<br><br>
+<hr>
+
+<h2>등록된 목표 리스트</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>루틴명</th>
+        <th>타입</th>
+        <th>목표 수치</th>
+        <th>반복 주기</th>
+        <th>수행 요일</th>
+        <th>시작 주</th>
+    </tr>
+    </thead>
+    <tbody id="routineListBody">
+    <tr th:if="${#lists.isEmpty(routines)}" id="emptyMessageRow">
+        <td colspan="6" style="text-align: center;">등록된 목표가 없어! 첫 목표를 등록해 봐.</td>
+    </tr>
+
+    <tr th:unless="${#lists.isEmpty(routines)}" th:each="routine : ${routines}">
+        <td th:text="${routine.routineName}">루틴명</td>
+        <td th:text="${routine.routineType}">타입</td>
+        <td th:text="${routine.targetValue != null ? routine.targetValue : '-'}">수치</td>
+        <td th:text="${routine.routineType == 'CHECK' ? routine.repeatWeeks + '주 간격' : '매주'}">반복주기</td>
+        <td th:text="${routine.selectedDays}">월,수,금</td>
+        <td th:text="${routine.startWeek}">2026-W14</td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    // 페이지 로드 시 이번 주 날짜를 기본값으로 세팅 (자바스크립트로 이번 주 ISO 문자열 구하기)
+    window.onload = function() {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        // 간단한 주차 계산 로직 (완벽한 ISO 주차 계산은 복잡하지만 예시로 간단히)
+        const weekNum = Math.ceil(Math.floor((currentDate - new Date(year, 0, 1)) / (24 * 60 * 60 * 1000)) / 7);
+        const weekStr = year + '-W' + String(weekNum).padStart(2, '0');
+        document.getElementById('startWeek').value = weekStr;
+    };
+
+    // 1. 루틴 타입 변경 시 입력 폼 제어
+    function handleTypeChange() {
+        const type = document.getElementById('routineType').value;
+        const targetValueRow = document.getElementById('targetValueRow');
+        const checkRepeatArea = document.getElementById('checkRepeatArea');
+        const otherRepeatArea = document.getElementById('otherRepeatArea');
+
+        if (type === 'CHECK') {
+            targetValueRow.classList.add('hidden'); // 목표 수치 숨김
+            checkRepeatArea.classList.remove('hidden'); // N주 간격 보임
+            otherRepeatArea.classList.add('hidden'); // 매주 고정 숨김
+        } else {
+            targetValueRow.classList.remove('hidden'); // 목표 수치 보임
+            checkRepeatArea.classList.add('hidden'); // N주 간격 숨김
+            otherRepeatArea.classList.remove('hidden'); // 매주 고정 보임
+        }
+    }
+
+    // 2. 매일 체크박스 제어
+    function toggleAllDays() {
+        const isChecked = document.getElementById('checkAllDays').checked;
+        const checkboxes = document.querySelectorAll('.day-checkbox');
+        checkboxes.forEach(cb => cb.checked = isChecked);
+    }
+    // 개별 요일 클릭 시 '매일' 체크박스 상태 자동 변경
+    function updateAllDaysCheckbox() {
+        const checkAllDays = document.getElementById('checkAllDays');
+        const checkboxes = document.querySelectorAll('.day-checkbox');
+        const checkedBoxes = document.querySelectorAll('.day-checkbox:checked');
+
+        // 전체 요일 개수(7개)와 현재 체크된 요일 개수가 같으면 '매일' 체크, 아니면 해제
+        if (checkboxes.length === checkedBoxes.length) {
+            checkAllDays.checked = true;
+        } else {
+            checkAllDays.checked = false;
+        }
+    }
+
+    // 3. 서버로 데이터 전송 및 리스트 즉시 업데이트 (새로고침 없음!)
+    async function saveRoutine() {
+        const routineName = document.getElementById('routineName').value;
+        const routineType = document.getElementById('routineType').value;
+        const targetValue = document.getElementById('targetValue').value;
+        const startWeek = document.getElementById('startWeek').value;
+
+        let repeatWeeks = 1; // 기본값
+        if (routineType === 'CHECK') {
+            repeatWeeks = document.getElementById('repeatWeeks').value;
+        }
+
+        // 체크된 요일들 배열로 모으기
+        const selectedDays = [];
+        document.querySelectorAll('.day-checkbox:checked').forEach(cb => {
+            selectedDays.push(cb.value);
+        });
+
+        if (!routineName) {
+            alert('루틴명을 입력해 줘!');
+            return;
+        }
+        if (selectedDays.length === 0) {
+            alert('수행할 요일을 하나 이상 선택해 줘!');
+            return;
+        }
+
+        // 서버로 보낼 JSON 데이터 만들기
+        const requestData = {
+            routineName: routineName,
+            routineType: routineType,
+            targetValue: routineType === 'CHECK' ? null : targetValue,
+            repeatWeeks: repeatWeeks,
+            selectedDays: selectedDays, // 백엔드에서 List<String> 등으로 받음
+            startWeek: startWeek
+        };
+
+        try {
+            // [서버 API 호출 부분]
+            // 실제 백엔드 컨트롤러 경로('/api/routines')에 맞게 나중에 수정해 줘!
+            const response = await fetch('/api/routines', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            });
+
+            if (response.ok) {
+                // 서버 저장 성공 시 화면 리스트에 한 줄 추가 (새로고침 안함)
+                addRoutineToList(requestData);
+                alert('목표가 등록되었어!');
+
+                // 입력 폼 초기화
+                document.getElementById('routineName').value = '';
+                document.getElementById('targetValue').value = '';
+                document.getElementById('checkAllDays').checked = false;
+                toggleAllDays(); // 요일 체크박스 다 풀기
+            } else {
+                alert('등록에 실패했어. 다시 시도해 봐.');
+            }
+        } catch (error) {
+            console.error('에러 발생:', error);
+            // 프론트엔드 테스트용 (백엔드 없어도 리스트 추가되는 거 보려면 이 부분 주석 해제)
+            // addRoutineToList(requestData);
+        }
+    }
+
+    // 4. 표에 새로운 행을 추가하는 함수
+    function addRoutineToList(data) {
+        const tbody = document.getElementById('routineListBody');
+
+        // "등록된 목표가 없어!" 메시지가 있으면 지워줌
+        const emptyMessage = document.getElementById('emptyMessageRow');
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
+
+        const tr = document.createElement('tr');
+
+        // 타입별로 보여줄 텍스트 가공
+        const targetDisplay = data.routineType === 'CHECK' ? '-' : data.targetValue;
+        const repeatDisplay = data.routineType === 'CHECK' ? data.repeatWeeks + '주 간격' : '매주';
+
+        tr.innerHTML = `
+            <td>${data.routineName}</td>
+            <td>${data.routineType}</td>
+            <td>${targetDisplay}</td>
+            <td>${repeatDisplay}</td>
+            <td>${data.selectedDays.join(', ')}</td>
+            <td>${data.startWeek}</td>
+        `;
+
+        // 새로 추가된 데이터는 위로 올라오게 표의 맨 첫번째 자리에 삽입
+        tbody.insertBefore(tr, tbody.firstChild);
+    }
+</script>
+
+</body>
+</html>

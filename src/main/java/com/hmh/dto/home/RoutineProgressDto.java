@@ -1,4 +1,4 @@
-package com.hmh.dto.dashboard;
+package com.hmh.dto.home;
 
 public class RoutineProgressDto {
 }

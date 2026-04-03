@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/dashboard")
-public class DashboardApiController {
+@RequestMapping("/api/home")
+public class HomeApiController {
 }

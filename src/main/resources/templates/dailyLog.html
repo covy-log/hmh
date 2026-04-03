@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>대시보드 - 일일 루틴</title>
+    <style>
+        /* 목표 설정 페이지와 동일한 기본 스타일 */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+
+        /* 탭 버튼 스타일 (선택사항이지만 깔끔하게 보이도록 추가) */
+        button { padding: 8px 15px; margin-right: 5px; cursor: pointer; }
+
+        /* 체크박스, 요약 수치 등은 가운데 정렬이 더 예뻐서 추가한 클래스 */
+        .text-center { text-align: center; }
+    </style>
+</head>
+<body>
+
+<div>
+    <button type="button" style="font-weight: bold;">일일 루틴</button>
+    <button type="button" onclick="location.href='/routineCycleStatus'">루틴 현황</button>
+    <button type="button" onclick="location.href='/routineSetting'">목표 설정</button>
+</div>
+
+<hr>
+
+<h2>오늘의 루틴 목록</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th class="text-center" style="width: 80px;">상태</th>
+        <th>루틴명</th>
+        <th>수치</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr th:if="${#lists.isEmpty(routines)}">
+        <td colspan="3" class="text-center" style="padding: 30px;">
+            아직 설정된 일일 루틴이 없어!<br><br>
+            상단의 <b>'목표 설정'</b> 탭에서 새로운 루틴을 추가해봐.
+        </td>
+    </tr>
+
+    <tr th:unless="${#lists.isEmpty(routines)}" th:each="routine : ${routines}">
+        <td class="text-center">
+            <input type="checkbox" th:checked="${routine.isCompleted}" style="width: 18px; height: 18px;">
+        </td>
+
+        <td th:text="${routine.title}">루틴 이름</td>
+
+        <td>
+            <span th:if="${routine.isCumulative}">
+                <input type="number" th:value="${routine.currentValue}" style="width: 60px; padding: 3px;">
+                <span th:text="' / ' + ${routine.targetValue}" style="color: #555;"> / 목표치</span>
+            </span>
+            <span th:unless="${routine.isCumulative}">
+                1회
+            </span>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+
+<br><br>
+
+<h2>일일 현황 요약</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th class="text-center">완료</th>
+        <th class="text-center">전체</th>
+        <th class="text-center">달성률</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="text-center" th:text="${completedCount != null ? completedCount : 0}" style="font-size: 1.2em; font-weight: bold; color: #4CAF50;">0</td>
+        <td class="text-center" th:text="${totalCount != null ? totalCount : 0}" style="font-size: 1.2em; font-weight: bold;">0</td>
+        <td class="text-center" th:text="${achievementRate != null ? achievementRate : 0} + '%'" style="font-size: 1.2em; font-weight: bold; color: #2196F3;">0%</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
