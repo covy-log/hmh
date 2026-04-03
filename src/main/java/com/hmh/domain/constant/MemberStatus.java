@@ -1,13 +1,14 @@
 package com.hmh.domain.constant;
 
-public enum MemberRole {
-    BASIC_USER("일반 사용자"),
-    PREMIUM_USER("유료 사용자"),
-    ADMIN("관리자");
+public enum MemberStatus {
+    ACTIVE("활성"),
+    DORMANCY("휴면"),
+    DELETED("탈퇴"),
+    BANNED("정지");
 
     private final String description;
 
-    MemberRole(String description) {
+    MemberStatus(String description) {
         this.description = description;
     }
 
