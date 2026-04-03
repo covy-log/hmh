@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>회원가입</title>
 </head>
 <body>
+<h2>회원가입</h2>
 
+<div>
+    <input type="text" id="loginId" placeholder="사용할 아이디"><br><br>
+    <input type="password" id="password" placeholder="비밀번호"><br><br>
+    <input type="text" id="name" placeholder="이름 (또는 닉네임)"><br><br>
+    <input type="email" id="email" placeholder="이메일 주소"><br><br>
+    <button onclick="signup()">가입하기</button>
+</div>
+
+<br>
+<a href="login.html">이미 계정이 있으신가요? 로그인 하러가기</a>
+
+<script>
+    async function signup() {
+        // 1. 입력된 값 가져오기
+        const loginId = document.getElementById('loginId').value;
+        const password = document.getElementById('password').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+
+        // 2. 서버로 JSON 데이터 전송
+        const response = await fetch('/api/members/join', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                loginId: loginId,
+                password: password,
+                name: name,
+                email: email
+            })
+        });
+
+        // 3. 결과 처리
+        if (response.status === 201) { // 컨트롤러에서 설정한 HttpStatus.CREATED
+            alert('회원가입이 완료되었습니다! 로그인 해주세요.');
+            window.location.href = 'login.html'; // 가입 성공 시 로그인 페이지로 강제 이동
+        } else {
+            const errorMessage = await response.text();
+            alert('회원가입 실패: ' + errorMessage);
+        }
+    }
+</script>
 </body>
 </html>

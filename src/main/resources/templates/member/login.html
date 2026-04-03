@@ -1,10 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>로그인</title>
 </head>
 <body>
+<h2>로그인</h2>
 
+<div>
+    <input type="text" id="loginId" placeholder="아이디"><br><br>
+    <input type="password" id="password" placeholder="비밀번호"><br><br>
+    <button onclick="login()">로그인</button>
+</div>
+
+<br>
+<a href="signup.html">아직 회원이 아니신가요? 회원가입 하러가기</a>
+
+<script>
+    async function login() {
+        // 1. 입력된 값 가져오기
+        const loginId = document.getElementById('loginId').value;
+        const password = document.getElementById('password').value;
+
+        // 2. 서버로 JSON 데이터 전송 (우리가 만든 MemberApiController 호출)
+        const response = await fetch('/api/members/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                loginId: loginId,
+                password: password
+            })
+        });
+
+        // 3. 결과 처리
+        if (response.ok) { // HTTP 상태 코드가 200~299일 때
+            alert('로그인 성공!');
+            // 로그인 성공 후 메인 페이지로 이동 (나중에 main.html을 만들면 돼)
+            // window.location.href = '/main.html';
+        } else {
+            const errorMessage = await response.text();
+            alert('로그인 실패: ' + errorMessage);
+        }
+    }
+</script>
 </body>
 </html>
