@@ -1,13 +1,13 @@
 package com.hmh.repository;
 
 import com.hmh.domain.RoutineCycle;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
-@Repository
-public interface RoutineCycleRepository {
+@Mapper
+public interface RoutineCycleMapper {
 
     /**
      * 루틴 사이클 저장

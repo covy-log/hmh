@@ -1,14 +1,14 @@
 package com.hmh.repository;
 
 import com.hmh.domain.DailyLog;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface DailyLogRepository {
+@Mapper
+public interface DailyLogMapper {
 
     /**
      * 일일 기록 저장

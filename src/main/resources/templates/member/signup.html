@@ -12,6 +12,10 @@
     <input type="password" id="password" placeholder="비밀번호"><br><br>
     <input type="text" id="name" placeholder="이름 (또는 닉네임)"><br><br>
     <input type="email" id="email" placeholder="이메일 주소"><br><br>
+    <label>주 시작 요일 : </label>
+    <label><input type="radio" name="weekStartDay" value="1" checked> 월</label>
+    <label><input type="radio" name="weekStartDay" value="7"> 일</label>
+    <br><br>
     <button onclick="signup()">가입하기</button>
 </div>
 
@@ -24,7 +28,8 @@
         const loginId = document.getElementById('loginId').value;
         const password = document.getElementById('password').value;
         const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
+        const email = document.getElementById('email').value
+        const weekStartDay = document.querySelector('input[name="weekStartDay"]:checked').value;
 
         // 2. 서버로 JSON 데이터 전송
         const response = await fetch('/api/members/join', {
@@ -36,7 +41,8 @@
                 loginId: loginId,
                 password: password,
                 name: name,
-                email: email
+                email: email,
+                weekStartDay: weekStartDay
             })
         });
 

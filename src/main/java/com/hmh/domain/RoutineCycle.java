@@ -60,7 +60,8 @@ public class RoutineCycle {
     /**
      * 주기 상태
      */
-    private RoutineStatus status;
+    @Builder.Default
+    private RoutineStatus status = RoutineStatus.IN_PROGRESS; // 기본값은 '진행 중'
 
     /**
      * 생성일시

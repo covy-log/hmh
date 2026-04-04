@@ -33,7 +33,7 @@ public class MemberApiController {
                 .password(joinDto.getPassword()) // [주의] 실무에서는 여기서 무조건 BCrypt 등으로 암호화해야 해!
                 .name(joinDto.getName())
                 .email(joinDto.getEmail())
-                .createAt(LocalDateTime.now()) // 가입일시 기록
+                .weekStartDay(joinDto.getWeekStartDay())
                 .build();
 
         try {

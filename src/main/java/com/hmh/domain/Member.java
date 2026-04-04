@@ -42,6 +42,11 @@ public class Member {
     private String email;
 
     /**
+     * 주시작요일
+     */
+    private String weekStartDay;
+
+    /**
      * 회원 상태 (예: ACTIVE, DORMANCY(휴면), BANNED, DELETED)
      */
     @Builder.Default

@@ -1,27 +1,27 @@
 package com.hmh.repository;
 
 import com.hmh.domain.Member;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface MemberRepository {
+@Mapper // 스프링한테 "이건 MyBatis 매퍼야!" 라고 알려주는 어노테이션
+public interface MemberMapper {
 
     /**
      * 회원 저장
      * @param member
      * @return
      */
-    Member save(Member member);
+    void save(Member member);
 
     /**
      * 회원 조회
      * @param id
      * @return
      */
-    Optional<Member> findById(String id);
+    Optional<Member> findById(String loginId);
 
     /**
      * 전체 회원 조회
@@ -34,9 +34,4 @@ public interface MemberRepository {
      * @param member
      */
     void update(Member member);
-
-    /**
-     * 전체 회원 초기화(테스트 용)
-     */
-    void clearStore();
 }

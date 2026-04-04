@@ -1,6 +1,6 @@
 package com.hmh.service;
 
-import com.hmh.repository.RoutineRepository;
+import com.hmh.repository.RoutineMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ public class RoutineService {
 
     private final MemberService memberService;
 
-    private final RoutineRepository routineRepository;
+    private final RoutineMapper routineMapper;
 
 
 }
