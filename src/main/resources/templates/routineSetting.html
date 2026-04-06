@@ -50,7 +50,7 @@
         <th>반복 주기</th>
         <td>
             <div id="checkRepeatArea">
-                <input type="number" id="repeatWeeks" value="1" style="width: 50px;"> 주 간격으로 반복
+                <input type="number" id="repeatWeeks" value="1" min="1" style="width: 50px;"> 주 간격으로 반복
             </div>
             <div id="otherRepeatArea" class="hidden">
                 매주 (기본값)
@@ -60,14 +60,14 @@
     <tr>
         <th>수행 요일</th>
         <td>
-            <label><input type="checkbox" id="checkAllDays" onclick="toggleAllDays()"> 매일</label> |
-            <label><input type="checkbox" class="day-checkbox" value="MON" onclick="updateAllDaysCheckbox()"> 월</label>
-            <label><input type="checkbox" class="day-checkbox" value="TUE" onclick="updateAllDaysCheckbox()"> 화</label>
-            <label><input type="checkbox" class="day-checkbox" value="WED" onclick="updateAllDaysCheckbox()"> 수</label>
-            <label><input type="checkbox" class="day-checkbox" value="THU" onclick="updateAllDaysCheckbox()"> 목</label>
-            <label><input type="checkbox" class="day-checkbox" value="FRI" onclick="updateAllDaysCheckbox()"> 금</label>
-            <label><input type="checkbox" class="day-checkbox" value="SAT" onclick="updateAllDaysCheckbox()"> 토</label>
-            <label><input type="checkbox" class="day-checkbox" value="SUN" onclick="updateAllDaysCheckbox()"> 일</label>
+            <label><input type="checkbox" id="checkAllDays" onclick="toggleAllDays()" checked> 매일</label> |
+            <label><input type="checkbox" class="day-checkbox" value="MON" onclick="updateAllDaysCheckbox()" checked> 월</label>
+            <label><input type="checkbox" class="day-checkbox" value="TUE" onclick="updateAllDaysCheckbox()" checked> 화</label>
+            <label><input type="checkbox" class="day-checkbox" value="WED" onclick="updateAllDaysCheckbox()" checked> 수</label>
+            <label><input type="checkbox" class="day-checkbox" value="THU" onclick="updateAllDaysCheckbox()" checked> 목</label>
+            <label><input type="checkbox" class="day-checkbox" value="FRI" onclick="updateAllDaysCheckbox()" checked> 금</label>
+            <label><input type="checkbox" class="day-checkbox" value="SAT" onclick="updateAllDaysCheckbox()" checked> 토</label>
+            <label><input type="checkbox" class="day-checkbox" value="SUN" onclick="updateAllDaysCheckbox()" checked> 일</label>
         </td>
     </tr>
     <tr>
@@ -115,8 +115,11 @@
 </table>
 
 <script>
+
     // 페이지 로드 시 이번 주 날짜를 기본값으로 세팅 (자바스크립트로 이번 주 ISO 문자열 구하기)
     window.onload = function() {
+        toggleAllDays();
+
         const currentDate = new Date();
         const year = currentDate.getFullYear();
         // 간단한 주차 계산 로직 (완벽한 ISO 주차 계산은 복잡하지만 예시로 간단히)
@@ -145,6 +148,7 @@
 
     // 2. 매일 체크박스 제어
     function toggleAllDays() {
+        console.log("toggle");
         const isChecked = document.getElementById('checkAllDays').checked;
         const checkboxes = document.querySelectorAll('.day-checkbox');
         checkboxes.forEach(cb => cb.checked = isChecked);

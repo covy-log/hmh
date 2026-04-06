@@ -6,7 +6,7 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="seqNo" keyColumn="seq_no">
         INSERT INTO member
-            (login_id, password, name, email, week_start_day)
+            (login_id, password, name, email, week_start_day, cre)
         VALUES (#{loginId}, #{password}, #{name}, #{email}, #{weekStartDay})
     </insert>
 
