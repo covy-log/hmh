@@ -30,6 +30,12 @@ public interface MemberMapper {
     List<Member> findAll();
 
     /**
+     * 마지막 로그인 최신화
+     * @param member
+     */
+    void updateLastLoginAt(Member member);
+
+    /**
      * 회원 정보 변경(탈퇴포함)
      * @param member
      */

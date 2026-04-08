@@ -3,6 +3,7 @@ package com.hmh.service;
 import com.hmh.domain.Member;
 import com.hmh.repository.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,16 +15,26 @@ public class MemberService {
 
     private final MemberMapper memberMapper;
 
-    /**
-     * 로그인 로직 (MemberService 내부에 추가)
-     */
-    public Member login(String loginId, String password) {
-        // 아이디로 회원을 찾고, 비밀번호가 일치하면 해당 회원 객체를 반환
+    private final BCryptPasswordEncoder passwordEncoder;
 
-        // todo 성공시 last_login_at 마지막 로그인 시간 변경하기
-        return memberMapper.findById(loginId)
-                .filter(m -> m.getPassword().equals(password))
-                .orElse(null); // 실패 시 null 반환
+    /**
+     * 로그인 로직
+     */
+    public Member login(String loginId, String encInputPwd) {
+
+        Member member = memberMapper.findById(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
+        String encPwd = member.getPassword();
+        boolean isMatch = passwordEncoder.matches(encInputPwd, encPwd);
+
+        if (isMatch) {
+            memberMapper.updateLastLoginAt(member); // 로그인 시간 최신화
+        } else {
+            throw new IllegalArgumentException("아이디 또는 비밀번호가 틀렸습니다.");
+        }
+
+        return member;
     }
 
     /**

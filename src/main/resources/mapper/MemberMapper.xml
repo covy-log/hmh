@@ -6,7 +6,7 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="seqNo" keyColumn="seq_no">
         INSERT INTO member
-            (login_id, password, name, email, week_start_day, cre)
+            (login_id, password, name, email, week_start_day)
         VALUES (#{loginId}, #{password}, #{name}, #{email}, #{weekStartDay})
     </insert>
 
@@ -18,7 +18,9 @@
         SELECT * FROM member
     </select>
 
-    <update id="update">
-
+    <update id="updateLastLoginAt" parameterType="Member">
+        UPDATE member
+        SET last_login_at = NOW()
+        WHERE login_id = #{loginId}
     </update>
 </mapper>
