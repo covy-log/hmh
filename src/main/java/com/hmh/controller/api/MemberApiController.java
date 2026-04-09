@@ -61,9 +61,9 @@ public class MemberApiController {
                                         HttpServletRequest request) {
 
         String loginId = loginDto.getLoginId();
-        String encInputPwd = passwordEncoder.encode(loginDto.getPassword());
+        String loginPwd = loginDto.getPassword();
 
-        Member member = memberService.login(loginId, encInputPwd);
+        Member member = memberService.login(loginId, loginPwd);
 
         // 로그인 성공 처리 (세션 생성)
         // request.getSession(true): 세션이 있으면 있는 걸 반환하고, 없으면 신규 세션을 생성함

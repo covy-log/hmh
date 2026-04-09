@@ -37,7 +37,7 @@ public class Routine {
     private int targetValue;
 
     /**
-     * 루틴 목표 타입 (예: CHECK, COUNT, TIME)
+     * 루틴 타입 (예: CHECK, COUNT, TIME)
      */
     private RoutineType routineType;
 

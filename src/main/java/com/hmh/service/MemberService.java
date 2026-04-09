@@ -20,13 +20,13 @@ public class MemberService {
     /**
      * 로그인 로직
      */
-    public Member login(String loginId, String encInputPwd) {
+    public Member login(String loginId, String loginPwd) {
 
         Member member = memberMapper.findById(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
         String encPwd = member.getPassword();
-        boolean isMatch = passwordEncoder.matches(encInputPwd, encPwd);
+        boolean isMatch = passwordEncoder.matches(loginPwd, encPwd);
 
         if (isMatch) {
             memberMapper.updateLastLoginAt(member); // 로그인 시간 최신화

@@ -3,4 +3,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hmh.repository.RoutineMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="seqNo" keyColumn="seq_no">
+        INSERT INTO routine
+        (member_seq_no, title, target_value, routine_type, interval_weeks, days_of_week, start_ymd)
+        VALUES(#{memberSeqNo}, #{title}, #{targetValue}, #{routineType}, #{intervalWeeks}, #{daysOfWeek}, #{startYmd})
+    </insert>
+
+    <select id="findAllByMemberSeqNo" parameterType="long" resultType="Routine">
+        SELECT
+            *
+        FROM routine
+        WHERE member_seq_no = #{memberSeqNo}
+        AND status = 'IN_PROGRESS'
+    </select>
 </mapper>

@@ -1,11 +1,15 @@
 package com.hmh.controller.view;
 
+import com.hmh.domain.Routine;
 import com.hmh.service.RoutineService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -45,16 +49,20 @@ public class ViewController {
     @GetMapping("/routineCycleStatus")
     public String routineCycleStatusPage() {
 
-
         return "routineCycleStatus";
     }
 
     /**
-     * 목표 설정 페이지 이동
+     * 루틴 설정 페이지 이동
      */
     @GetMapping("/routineSetting")
-    public String routineSettingPage() {
+    public String routineSettingPage(HttpServletRequest request, Model model) {
 
+        HttpSession session = request.getSession();
+        long memberSeqNo = (long) session.getAttribute("LOGIN_MEMBER");
+        List<Routine> routineList = routineService.findAllByMemberSeqNo(memberSeqNo);
+
+        model.addAttribute("routineList", routineList);
 
         return "routineSetting";
     }

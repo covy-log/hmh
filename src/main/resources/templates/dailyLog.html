@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>대시보드 - 일일 루틴</title>
     <style>
-        /* 목표 설정 페이지와 동일한 기본 스타일 */
+        /* 루틴 설정 페이지와 동일한 기본 스타일 */
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
         th { background-color: #f4f4f4; }
@@ -21,7 +21,7 @@
 <div>
     <button type="button" style="font-weight: bold;">일일 루틴</button>
     <button type="button" onclick="location.href='/routineCycleStatus'">루틴 현황</button>
-    <button type="button" onclick="location.href='/routineSetting'">목표 설정</button>
+    <button type="button" onclick="location.href='/routineSetting'">루틴 설정</button>
 </div>
 
 <hr>
@@ -41,7 +41,7 @@
     <tr th:if="${#lists.isEmpty(routines)}">
         <td colspan="3" class="text-center" style="padding: 30px;">
             아직 설정된 일일 루틴이 없어!<br><br>
-            상단의 <b>'목표 설정'</b> 탭에서 새로운 루틴을 추가해봐.
+            상단의 <b>'루틴 설정'</b> 탭에서 새로운 루틴을 추가해봐.
         </td>
     </tr>
 
