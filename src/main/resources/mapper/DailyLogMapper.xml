@@ -3,4 +3,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hmh.repository.DailyLogMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="seqNo" keyColumn="seq_no">
+        INSERT INTO daily_log
+        (cycle_seq_no, member_seq_no, todo_ymd)
+        VALUES (#{cycleSeqNo}, #{memberSeqNo}, #{todoYmd})
+    </insert>
+
+    <select id="findAllOfTodayByDailyLog" resultType="DailyLogDto" parameterType="DailyLog">
+        SELECT
+            r.title,
+
+        FROM daily_log dl
+        INNER JOIN routine_cycle rc ON dl.cycle_seq_no = rc.seq_no
+        INNER JOIN routine r ON rc.routine_seq_no = r.seq_no
+        WHERE dl.member_seq_no = #{memberSeqNo}
+        AND dl.todo_ymd = #{todoYmd}
+    </select>
 </mapper>

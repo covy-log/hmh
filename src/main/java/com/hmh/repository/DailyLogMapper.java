@@ -1,6 +1,7 @@
 package com.hmh.repository;
 
 import com.hmh.domain.DailyLog;
+import com.hmh.dto.Routine.DailyLogDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDate;
@@ -15,22 +16,14 @@ public interface DailyLogMapper {
      * @param dailyLog
      * @return
      */
-    DailyLog save(DailyLog dailyLog);
-
-    /**
-     * 일일 기록 조회
-     * @param seqNo
-     * @return
-     */
-    Optional<DailyLog> findById(Long seqNo);
+    void save(DailyLog dailyLog);
 
     /**
      * 특정 사용자의 오늘 해야 할 루틴 목록 조회
-     * @param memberSeqNo
-     * @param todoYmd
+     * @param dailyLog
      * @return
      */
-    List<DailyLog> findAllByMemberSeqNoAndTodoYmd(Long memberSeqNo, LocalDate todoYmd);
+    List<DailyLogDto> findAllOfTodayByDailyLog(DailyLog dailyLog);
 
     /**
      * 특정 사이클(예: 4월 1주차)에 속한 모든 일일 기록 조회 (통계용)

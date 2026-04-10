@@ -11,8 +11,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoutineService {
 
-    private final MemberService memberService;
-
     private final RoutineMapper routineMapper;
 
     /**

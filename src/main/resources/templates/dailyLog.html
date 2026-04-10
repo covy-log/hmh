@@ -38,27 +38,26 @@
     </thead>
     <tbody>
 
-    <tr th:if="${#lists.isEmpty(routines)}">
+    <tr th:if="${#lists.isEmpty(dailyLogDtoList)}">
         <td colspan="3" class="text-center" style="padding: 30px;">
             아직 설정된 일일 루틴이 없어!<br><br>
             상단의 <b>'루틴 설정'</b> 탭에서 새로운 루틴을 추가해봐.
         </td>
     </tr>
 
-    <tr th:unless="${#lists.isEmpty(routines)}" th:each="routine : ${routines}">
+    <tr th:unless="${#lists.isEmpty(dailyLogDtoList)}" th:each="dailyLogDot : ${dailyLogDtoList}">
         <td class="text-center">
-            <input type="checkbox" th:checked="${routine.isCompleted}" style="width: 18px; height: 18px;">
+            <input type="checkbox" th:checked="${dailyLogDot.completedAt}" style="width: 18px; height: 18px;">
         </td>
 
-        <td th:text="${routine.title}">루틴 이름</td>
+        <td th:text="${dailyLogDot.title}">루틴 이름</td>
 
         <td>
-            <span th:if="${routine.isCumulative}">
-                <input type="number" th:value="${routine.currentValue}" style="width: 60px; padding: 3px;">
-                <span th:text="' / ' + ${routine.targetValue}" style="color: #555;"> / 목표치</span>
-            </span>
-            <span th:unless="${routine.isCumulative}">
+            <span th:if="${dailyLogDot.routineType eq 'CHECK'}">
                 1회
+            </span>
+            <span th:unless="${dailyLogDot.routineType eq 'CHECK'}">
+                <input type="number" th:value="${dailyLogDot.achievedValue}" style="width: 60px; padding: 3px;">
             </span>
         </td>
     </tr>

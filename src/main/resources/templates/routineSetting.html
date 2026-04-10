@@ -106,8 +106,8 @@
     <tr th:unless="${#lists.isEmpty(routineList)}" th:each="routine : ${routineList}">
         <td th:text="${routine.title}">루틴명</td>
         <td th:text="${routine.routineType}">타입</td>
-        <td th:text="${routine.targetValue != null ? routine.targetValue : '-'}">수치</td>
-        <td th:text="${routine.routineType == 'CHECK' ? routine.intervalWeeks + '주 간격' : '매주'}">반복주기</td>
+        <td th:text="${routine.targetValue != null ? routine.targetValue : 1}">수치</td>
+        <td th:text="${routine.intervalWeeks == 1 ? '매주' : routine.intervalWeeks + '주 간격'}">반복주기</td>
         <td th:text="${routine.daysOfWeek}">월,수,금</td>
         <td th:text="${routine.startYmd}">2026-W14</td>
     </tr>
@@ -327,7 +327,7 @@
 
         return str.split(',')
         .map(num => dayMap[num.trim()] || num.trim())
-        .join(',');
+        .join(', ');
     }
 </script>
 

@@ -14,7 +14,7 @@ public interface RoutineCycleMapper {
      * @param cycle
      * @return
      */
-    RoutineCycle save(RoutineCycle cycle);
+    void save(RoutineCycle cycle);
 
     /**
      * 루틴 사이클 조회
