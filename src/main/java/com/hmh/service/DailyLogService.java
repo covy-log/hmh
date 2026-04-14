@@ -22,4 +22,10 @@ public class DailyLogService {
     public List<DailyLogDto> findAllOfTodayByDailyLog(DailyLog dailyLog) {
         return dailyLogMapper.findAllOfTodayByDailyLog(dailyLog);
     }
+
+    public void update(DailyLog dailyLog) {
+
+        dailyLogMapper.update(dailyLog);
+    }
 }
+

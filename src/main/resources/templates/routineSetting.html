@@ -34,9 +34,9 @@
     <tr>
         <th>루틴 타입</th>
         <td>
-            <select id="routineType" onchange="handleTypeChange()">
-                <option value="CHECK">단순체크</option>
-                <option value="COUNT">횟수</option>
+            <select id="routineType">
+                <option value="CHECK">yes/no</option>
+                <option value="COUNT">회</option>
                 <option value="TIME">시간</option>
                 <option value="DISTANCE">km</option>
             </select>
@@ -161,7 +161,7 @@
         const requestData = {
             title: title,
             routineType: routineType,
-            targetValue: routineType === 'CHECK' ? 1 : targetValue,
+            targetValue: targetValue,
             intervalWeeks: intervalWeeks,
             daysOfWeek: daysOfWeek.join(','),
             startYmd: formattedDate
@@ -247,22 +247,22 @@
     }
 
     // 루틴 타입 변경 시 입력 폼 제어
-    function handleTypeChange() {
-        const type = document.getElementById('routineType').value;
-        const targetValueRow = document.getElementById('targetValueRow');
-        const checkRepeatArea = document.getElementById('checkRepeatArea');
-        const otherRepeatArea = document.getElementById('otherRepeatArea');
-
-        if (type === 'CHECK') {
-            targetValueRow.classList.add('hidden'); // 목표 수치 숨김
-            checkRepeatArea.classList.remove('hidden'); // N주 간격 보임
-            otherRepeatArea.classList.add('hidden'); // 매주 고정 숨김
-        } else {
-            targetValueRow.classList.remove('hidden'); // 목표 수치 보임
-            checkRepeatArea.classList.add('hidden'); // N주 간격 숨김
-            otherRepeatArea.classList.remove('hidden'); // 매주 고정 보임
-        }
-    }
+    // function handleTypeChange() {
+    //     const type = document.getElementById('routineType').value;
+    //     const targetValueRow = document.getElementById('targetValueRow');
+    //     const checkRepeatArea = document.getElementById('checkRepeatArea');
+    //     const otherRepeatArea = document.getElementById('otherRepeatArea');
+    //
+    //     if (type === 'CHECK') {
+    //         targetValueRow.classList.add('hidden'); // 목표 수치 숨김
+    //         checkRepeatArea.classList.remove('hidden'); // N주 간격 보임
+    //         otherRepeatArea.classList.add('hidden'); // 매주 고정 숨김
+    //     } else {
+    //         targetValueRow.classList.remove('hidden'); // 목표 수치 보임
+    //         checkRepeatArea.classList.add('hidden'); // N주 간격 숨김
+    //         otherRepeatArea.classList.remove('hidden'); // 매주 고정 보임
+    //     }
+    // }
 
     // 매일 체크박스 제어
     function toggleAllDays() {

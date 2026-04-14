@@ -1,5 +1,6 @@
 package com.hmh.interceptor;
 
+import com.hmh.common.Const;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -15,7 +16,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession(false);
 
         // 세션이 아예 없거나, 로그인 정보(LOGIN_MEMBER)가 없으면 튕겨냄
-        if (session == null || session.getAttribute("LOGIN_MEMBER") == null) {
+        if (session == null || session.getAttribute(Const.LOGIN_MEMBER) == null) {
             // 미인증 사용자는 로그인 페이지로 리다이렉트
             // 센스 있게 원래 가려던 목적지(requestURI)를 파라미터로 달아주면 나중에 로그인 성공 시 원래 페이지로 보내주기 좋아
             response.sendRedirect("/login?redirectURL=" + requestURI);

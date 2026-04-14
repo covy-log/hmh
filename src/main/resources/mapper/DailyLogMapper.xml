@@ -12,12 +12,30 @@
 
     <select id="findAllOfTodayByDailyLog" resultType="DailyLogDto" parameterType="DailyLog">
         SELECT
+            dl.seq_no,
             r.title,
-
+            r.routine_type,
+            dl.status,
+            dl.achieved_value,
+            rc.target_value
         FROM daily_log dl
         INNER JOIN routine_cycle rc ON dl.cycle_seq_no = rc.seq_no
         INNER JOIN routine r ON rc.routine_seq_no = r.seq_no
         WHERE dl.member_seq_no = #{memberSeqNo}
         AND dl.todo_ymd = #{todoYmd}
     </select>
+
+    <update id="update" parameterType="DailyLog">
+        UPDATE daily_log
+        SET status = #{status},
+            achieved_value = #{achievedValue},
+            change_at = NOW()
+            <if test='status.equals("DONE")'>
+                ,completed_at = NOW()
+            </if>
+            <if test='!status.equals("DONE")'>
+                ,completed_at = null
+            </if>
+        WHERE seq_no = #{seqNo}
+    </update>
 </mapper>

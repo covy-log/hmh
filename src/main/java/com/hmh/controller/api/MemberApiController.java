@@ -1,5 +1,6 @@
 package com.hmh.controller.api;
 
+import com.hmh.common.Const;
 import com.hmh.domain.Member;
 import com.hmh.dto.member.MemberLoginDto;
 import com.hmh.dto.member.MemberSginupDto;
@@ -70,7 +71,7 @@ public class MemberApiController {
         HttpSession session = request.getSession(true);
 
         // 세션에 로그인 회원 정보 보관 (보통 상수나 enum으로 키값을 관리하는 게 좋아)
-        session.setAttribute("LOGIN_MEMBER", member.getSeqNo()); // 보안상 전체 객체보단 PK나 ID만 저장하는 걸 권장해
+        session.setAttribute(Const.LOGIN_MEMBER, member.getSeqNo()); // 보안상 전체 객체보단 PK나 ID만 저장하는 걸 권장해
 
         // 성공 시 200 OK 반환
         return ResponseEntity.ok("로그인 성공");

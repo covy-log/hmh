@@ -2,7 +2,7 @@ package com.hmh.domain.constant;
 
 public enum LogStatus {
 
-    TODO ("미완료"),
+    TODO ("진행중"),
     DONE ("완료"),
     FAIL ("실패");
 

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -49,13 +50,13 @@ public class RoutineCycle {
      * [중요] 주기가 생성될 당시의 목표 수치 스냅샷
      * 사용자가 중간에 목표를 20시간 -> 10시간으로 줄여도, 과거 주기의 목표치 기록은 변하면 안 됨
      */
-    private int targetValue;
+    private BigDecimal targetValue;
 
     /**
      * [선택] 이번 주기 동안 현재까지 달성한 누적 수치
      * 매번 daily_log를 다 더해서 계산해도 되지만, 여기에 누적값을 업데이트해두면 통계 화면 띄울 때 엄청 빠름
      */
-    private int currentAchievedValue;
+    private BigDecimal currentAchievedValue;
 
     /**
      * 주기 상태

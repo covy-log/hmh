@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -34,7 +35,7 @@ public class Routine {
     /**
      * 루틴 목표 수치 (예: 20시간, 4회)
      */
-    private int targetValue;
+    private BigDecimal targetValue;
 
     /**
      * 루틴 타입 (예: CHECK, COUNT, TIME)

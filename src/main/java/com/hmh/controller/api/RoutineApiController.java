@@ -1,8 +1,10 @@
 package com.hmh.controller.api;
 
+import com.hmh.common.Const;
 import com.hmh.domain.DailyLog;
 import com.hmh.domain.Routine;
 import com.hmh.domain.RoutineCycle;
+import com.hmh.dto.Routine.DailyLogDto;
 import com.hmh.dto.Routine.RoutineSettingDto;
 import com.hmh.service.DailyLogService;
 import com.hmh.service.RoutineCycleService;
@@ -36,7 +38,7 @@ public class RoutineApiController {
                                        HttpServletRequest request) {
         try {
             HttpSession session = request.getSession();
-            long memberSeqNo = (long) session.getAttribute("LOGIN_MEMBER");
+            Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
 
             Routine routine = Routine.builder()
                     .title(routineSettingDto.getTitle())
@@ -95,4 +97,29 @@ public class RoutineApiController {
         }
     }
 
+    @PostMapping("update")
+    public ResponseEntity<String> update(@Valid @RequestBody DailyLogDto dailyLogDto,
+                       HttpServletRequest request) {
+
+        try {
+            HttpSession session = request.getSession();
+            Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
+
+            DailyLog dailyLog = DailyLog.builder()
+                    .seqNo(dailyLogDto.getSeqNo())
+                    .status(dailyLogDto.getStatus())
+                    .memberSeqNo(memberSeqNo)
+                    .achievedValue(dailyLogDto.getAchievedValue())
+                    .build();
+
+            dailyLogService.update(dailyLog);
+
+            // 성공 시 201 Created 상태 코드 반환
+            return ResponseEntity.status(HttpStatus.CREATED).body("success");
+
+        } catch (IllegalStateException e) {
+            // 중복 루틴인 경우
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
 }

@@ -19,6 +19,12 @@ public interface DailyLogMapper {
     void save(DailyLog dailyLog);
 
     /**
+     * 일일 기록 변경
+     * @param dailyLog
+     */
+    void update(DailyLog dailyLog);
+
+    /**
      * 특정 사용자의 오늘 해야 할 루틴 목록 조회
      * @param dailyLog
      * @return

@@ -1,13 +1,13 @@
 package com.hmh.dto.Routine;
 
+import com.hmh.domain.constant.LogStatus;
 import com.hmh.domain.constant.RoutineType;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -16,10 +16,19 @@ import java.time.LocalDate;
 public class DailyLogDto {
 
     /**
+     * 고유 번호
+     */
+    private long seqNo;
+
+    /**
      * 루틴명
      */
-    @NotBlank(message = "루틴 명을 입력해주세요.")
     private String title;
+
+    /**
+     * 달성 상태
+     */
+    private LogStatus status;
 
     /**
      * 날짜
@@ -29,11 +38,25 @@ public class DailyLogDto {
     /**
      * 달성 수치 (예: 20시간, 4회)
      */
-    private int achievedValue;
+    private BigDecimal achievedValue;
+
+    /**
+     * 목표 수치 (예: 20시간, 4회)
+     */
+    private BigDecimal targetValue;
 
     /**
      * 루틴 타입 (예: CHECK, COUNT, TIME)
      */
     private RoutineType routineType;
 
+    /**
+     * 루틴 타입에 따른 단위명
+     */
+    private String unit;
+
+    public void setRoutineType(RoutineType routineType) {
+        setUnit(routineType.getDescription());
+        this.routineType = routineType;
+    }
 }

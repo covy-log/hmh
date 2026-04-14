@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -49,7 +50,7 @@ public class DailyLog {
      * - 체크형(단순 완료): 완료했으면 1, 아니면 0으로 처리.
      */
     @Builder.Default
-    private int achievedValue = 0;
+    private BigDecimal achievedValue;
 
     /**
      * 사용자가 실제로 '완료' 처리를 한 시간

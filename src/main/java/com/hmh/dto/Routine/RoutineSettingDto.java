@@ -2,12 +2,12 @@ package com.hmh.dto.Routine;
 
 import com.hmh.domain.constant.RoutineType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -25,7 +25,7 @@ public class RoutineSettingDto {
     /**
      * 루틴 목표 수치 (예: 20시간, 4회)
      */
-    private int targetValue;
+    private BigDecimal targetValue;
 
     /**
      * 루틴 타입 (예: CHECK, COUNT, TIME)

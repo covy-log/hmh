@@ -1,5 +1,6 @@
 package com.hmh.controller.view;
 
+import com.hmh.common.Const;
 import com.hmh.domain.DailyLog;
 import com.hmh.domain.Routine;
 import com.hmh.dto.Routine.DailyLogDto;
@@ -35,7 +36,7 @@ public class ViewController {
 
         // 세션이 없거나 로그인 정보가 없으면 로그인 페이지로 리다이렉트
 
-        if (session == null || session.getAttribute("LOGIN_MEMBER") == null) {
+        if (session == null || session.getAttribute(Const.LOGIN_MEMBER) == null) {
             return "member/login";
         }
 
@@ -49,7 +50,7 @@ public class ViewController {
     public String dailyLogPage(HttpServletRequest request, Model model) {
 
         HttpSession session = request.getSession();
-        long memberSeqNo = (long) session.getAttribute("LOGIN_MEMBER");
+        Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
 
         DailyLog dailyLog = DailyLog.builder()
                 .memberSeqNo(memberSeqNo)
@@ -58,6 +59,27 @@ public class ViewController {
 
         List<DailyLogDto> dailyLogDtoList = dailyLogService.findAllOfTodayByDailyLog(dailyLog);
 
+        int totalCount = dailyLogDtoList.size();
+        int completedCount = 0;
+
+        for (DailyLogDto dailyLogDto : dailyLogDtoList) {
+            if ("DONE".equals(dailyLogDto.getStatus().name())) { // NPE 방지를 위해 "DONE"을 앞으로 배치
+                completedCount++;
+            }
+        }
+
+        double achievementRate = 0.0;
+
+        if (totalCount > 0) {
+
+            double rawRate = ((double) completedCount / totalCount) * 100;
+
+            achievementRate = Math.round(rawRate * 10) / 10.0;
+        }
+
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("completedCount", completedCount);
+        model.addAttribute("achievementRate", achievementRate);
         model.addAttribute("dailyLogDtoList", dailyLogDtoList);
         return "dailyLog";
     }
@@ -68,7 +90,7 @@ public class ViewController {
     @GetMapping("/routineCycleStatus")
     public String routineCycleStatusPage(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession();
-        long memberSeqNo = (long) session.getAttribute("LOGIN_MEMBER");
+        Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
         List<Routine> routineList = routineService.findAllByMemberSeqNo(memberSeqNo);
 
         model.addAttribute("routineList", routineList);
@@ -82,7 +104,7 @@ public class ViewController {
     public String routineSettingPage(HttpServletRequest request, Model model) {
 
         HttpSession session = request.getSession();
-        long memberSeqNo = (long) session.getAttribute("LOGIN_MEMBER");
+        Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
         List<Routine> routineList = routineService.findAllByMemberSeqNo(memberSeqNo);
 
         model.addAttribute("routineList", routineList);

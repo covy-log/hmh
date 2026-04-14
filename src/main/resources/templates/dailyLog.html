@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <title>대시보드 - 일일 루틴</title>
     <style>
-        /* 루틴 설정 페이지와 동일한 기본 스타일 */
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
         th { background-color: #f4f4f4; }
-
-        /* 탭 버튼 스타일 (선택사항이지만 깔끔하게 보이도록 추가) */
         button { padding: 8px 15px; margin-right: 5px; cursor: pointer; }
-
-        /* 체크박스, 요약 수치 등은 가운데 정렬이 더 예뻐서 추가한 클래스 */
         .text-center { text-align: center; }
+
+        /* 비활성화된 input 스타일을 살짝 줘서 수정 불가 상태임을 명확히 함 */
+        input[type="number"]:disabled { background-color: #eee; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -45,19 +43,28 @@
         </td>
     </tr>
 
-    <tr th:unless="${#lists.isEmpty(dailyLogDtoList)}" th:each="dailyLogDot : ${dailyLogDtoList}">
+    <tr th:unless="${#lists.isEmpty(dailyLogDtoList)}" th:each="dailyLogDto : ${dailyLogDtoList}"
+        th:data-seq-no="${dailyLogDto.seqNo}">
+
         <td class="text-center">
-            <input type="checkbox" th:checked="${dailyLogDot.completedAt}" style="width: 18px; height: 18px;">
+            <input type="checkbox"
+                   th:checked="${dailyLogDto.status?.name() eq 'DONE'}"
+                   onchange="toggleStatus(this)"
+                   style="width: 18px; height: 18px;">
         </td>
 
-        <td th:text="${dailyLogDot.title}">루틴 이름</td>
+        <td th:text="${dailyLogDto.title}">루틴 이름</td>
 
         <td>
-            <span th:if="${dailyLogDot.routineType eq 'CHECK'}">
+            <span th:if="${dailyLogDto.routineType?.name() eq 'CHECK'}">
                 1회
+                <input type="hidden" class="achieved-value" value="1">
             </span>
-            <span th:unless="${dailyLogDot.routineType eq 'CHECK'}">
-                <input type="number" th:value="${dailyLogDot.achievedValue}" style="width: 60px; padding: 3px;">
+            <span th:unless="${dailyLogDto.routineType?.name() eq 'CHECK'}">
+                <input type="number" class="achieved-value"
+                       th:value="${dailyLogDto.achievedValue}"
+                       th:disabled="${dailyLogDto.status?.name() eq 'DONE'}"
+                       style="width: 60px; padding: 3px;">
             </span>
         </td>
     </tr>
@@ -79,12 +86,94 @@
     </thead>
     <tbody>
     <tr>
-        <td class="text-center" th:text="${completedCount != null ? completedCount : 0}" style="font-size: 1.2em; font-weight: bold; color: #4CAF50;">0</td>
-        <td class="text-center" th:text="${totalCount != null ? totalCount : 0}" style="font-size: 1.2em; font-weight: bold;">0</td>
-        <td class="text-center" th:text="${achievementRate != null ? achievementRate : 0} + '%'" style="font-size: 1.2em; font-weight: bold; color: #2196F3;">0%</td>
+        <td id="completedCountView" class="text-center" th:text="${completedCount != null ? completedCount : 0}" style="font-size: 1.2em; font-weight: bold; color: #4CAF50;">0</td>
+        <td id="totalCountView" class="text-center" th:text="${totalCount != null ? totalCount : 0}" style="font-size: 1.2em; font-weight: bold;">0</td>
+        <td id="achievementRateView" class="text-center" th:text="${achievementRate != null ? achievementRate : 0} + '%'" style="font-size: 1.2em; font-weight: bold; color: #2196F3;">0%</td>
     </tr>
     </tbody>
 </table>
+
+<script>
+    let totalCount = parseInt(document.getElementById('totalCountView').innerText) || 0;
+    let completedCount = parseInt(document.getElementById('completedCountView').innerText) || 0;
+
+    async function toggleStatus(checkbox) {
+        const tr = checkbox.closest('tr');
+        const seqNo = tr.getAttribute('data-seq-no');
+        const isChecked = checkbox.checked;
+        const status = isChecked ? 'DONE' : 'TODO';
+
+        const inputEl = tr.querySelector('.achieved-value');
+
+        // [중요] 실패 시 롤백을 위해 현재(변경 전) 값을 기억해둠
+        const originalValue = inputEl ? inputEl.value : 0;
+
+        if (isChecked && originalValue === "0"){
+            alert('오늘 달성한 수치를 입력해야 해!');
+            return;
+        }
+
+        // 서버로 보낼 새로운 달성 수치 결정 (체크 해제 시 0)
+        const targetAchievedValue = isChecked ? originalValue : 0;
+
+        // --- 1. 낙관적 업데이트: UI 즉시 변경 ---
+        if (inputEl && inputEl.type === 'number') {
+            inputEl.disabled = isChecked; // 체크되면 비활성화, 풀리면 활성화
+            if (!isChecked) {
+                inputEl.value = 0; // 체크 해제 시 화면의 수치도 0으로 변경
+            }
+        }
+
+        updateStatsUI(isChecked ? 1 : -1);
+
+        // --- 2. 백엔드 API 호출 ---
+        try {
+            const response = await fetch(`/api/routine/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    seqNo: seqNo,
+                    status: status,
+                    achievedValue: Number(targetAchievedValue) // 0 또는 입력된 값 전송
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('API update failed');
+            }
+
+        } catch (error) {
+            console.error('Update failed:', error);
+            alert('서버와 통신하는 데 문제가 발생했어. 수치를 원래대로 되돌릴게!');
+
+            // --- 3. 실패 시 롤백 (원상복구) ---
+            checkbox.checked = !isChecked; // 체크박스 상태 원복
+
+            if (inputEl && inputEl.type === 'number') {
+                inputEl.disabled = !isChecked; // 활성/비활성 상태 원복
+                inputEl.value = originalValue; // [중요] 0으로 바꿨던 수치를 원래 값으로 복구!
+            }
+
+            updateStatsUI(!isChecked ? 1 : -1); // 통계 수치 원복
+        }
+    }
+
+    function updateStatsUI(changeCount) {
+        if (totalCount === 0) return;
+
+        completedCount += changeCount;
+
+        if (completedCount < 0) completedCount = 0;
+        if (completedCount > totalCount) completedCount = totalCount;
+
+        const achievementRate = Math.round((completedCount / totalCount) * 100);
+
+        document.getElementById('completedCountView').innerText = completedCount;
+        document.getElementById('achievementRateView').innerText = achievementRate + '%';
+    }
+</script>
 
 </body>
 </html>
