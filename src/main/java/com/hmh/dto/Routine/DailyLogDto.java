@@ -18,7 +18,7 @@ public class DailyLogDto {
     /**
      * 고유 번호
      */
-    private long seqNo;
+    private Long seqNo;
 
     /**
      * 루틴명
@@ -44,6 +44,11 @@ public class DailyLogDto {
      * 목표 수치 (예: 20시간, 4회)
      */
     private BigDecimal targetValue;
+
+    /**
+     * 일일 한도 수치 (예: 20시간, 4회)
+     */
+    private BigDecimal dailyLimit;
 
     /**
      * 루틴 타입 (예: CHECK, COUNT, TIME)

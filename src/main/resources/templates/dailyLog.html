@@ -2,176 +2,207 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>대시보드 - 일일 루틴</title>
-    <style>
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        button { padding: 8px 15px; margin-right: 5px; cursor: pointer; }
-        .text-center { text-align: center; }
-
-        /* 비활성화된 input 스타일을 살짝 줘서 수정 불가 상태임을 명확히 함 */
-        input[type="number"]:disabled { background-color: #eee; cursor: not-allowed; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일일 루틴</title>
+    <link rel="stylesheet" th:href="@{/css/routine.css}" href="/css/routine.css">
 </head>
 <body>
 
-<div>
-    <button type="button" style="font-weight: bold;">일일 루틴</button>
-    <button type="button" onclick="location.href='/routineCycleStatus'">루틴 현황</button>
-    <button type="button" onclick="location.href='/routineSetting'">루틴 설정</button>
-</div>
+<div class="page-wrapper">
 
-<hr>
+    <!-- ── Top Navigation ── -->
+    <nav class="top-nav">
+        <div class="nav-tabs">
+            <button type="button" class="nav-btn active">일일 루틴</button>
+            <button type="button" class="nav-btn" onclick="location.href='/routineCycleStatus'">루틴 현황</button>
+            <button type="button" class="nav-btn" onclick="location.href='/routineSetting'">루틴 설정</button>
+        </div>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="테마 전환">🌙</button>
+    </nav>
 
-<h2>오늘의 루틴 목록</h2>
+    <!-- ── Stats Cards ── -->
+    <div class="stats-grid">
+        <div class="stat-card stat-done">
+            <div class="stat-label">완료</div>
+            <div class="stat-value" id="completedCountView"
+                 th:text="${completedCount != null ? completedCount : 0}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">전체</div>
+            <div class="stat-value" id="totalCountView"
+                 th:text="${totalCount != null ? totalCount : 0}">0</div>
+        </div>
+        <div class="stat-card stat-rate">
+            <div class="stat-label">달성률</div>
+            <div class="stat-value" id="achievementRateView"
+                 th:text="${achievementRate != null ? achievementRate : 0} + '%'">0%</div>
+        </div>
+    </div>
 
-<table>
-    <thead>
-    <tr>
-        <th class="text-center" style="width: 80px;">상태</th>
-        <th>루틴명</th>
-        <th>수치</th>
-    </tr>
-    </thead>
-    <tbody>
+    <!-- ── Today's Routine List ── -->
+    <h2 class="section-title">오늘의 루틴</h2>
 
-    <tr th:if="${#lists.isEmpty(dailyLogDtoList)}">
-        <td colspan="3" class="text-center" style="padding: 30px;">
-            아직 설정된 일일 루틴이 없어!<br><br>
-            상단의 <b>'루틴 설정'</b> 탭에서 새로운 루틴을 추가해봐.
-        </td>
-    </tr>
+    <div class="list-card">
+        <table class="routine-table">
+            <thead>
+            <tr>
+                <th class="check-cell">상태</th>
+                <th>루틴명</th>
+                <th class="value-cell">달성 수치</th>
+            </tr>
+            </thead>
+            <tbody>
 
-    <tr th:unless="${#lists.isEmpty(dailyLogDtoList)}" th:each="dailyLogDto : ${dailyLogDtoList}"
-        th:data-seq-no="${dailyLogDto.seqNo}">
+            <!-- Empty state -->
+            <tr th:if="${#lists.isEmpty(dailyLogDtoList)}" id="emptyMessageRow">
+                <td colspan="3">
+                    <div class="empty-state">
+                        <span class="empty-icon">🗓️</span>
+                        아직 설정된 루틴이 없어요.<br>
+                        <b>'루틴 설정'</b> 탭에서 새로운 루틴을 추가해 보세요.
+                    </div>
+                </td>
+            </tr>
 
-        <td class="text-center">
-            <input type="checkbox"
-                   th:checked="${dailyLogDto.status?.name() eq 'DONE'}"
-                   onchange="toggleStatus(this)"
-                   style="width: 18px; height: 18px;">
-        </td>
+            <!-- Routine rows -->
+            <tr th:unless="${#lists.isEmpty(dailyLogDtoList)}"
+                th:each="dailyLogDto : ${dailyLogDtoList}"
+                th:data-seq-no="${dailyLogDto.seqNo}"
+                th:classappend="${dailyLogDto.status?.name() eq 'DONE'} ? 'row-done' : ''">
 
-        <td th:text="${dailyLogDto.title}">루틴 이름</td>
+                <td class="check-cell">
+                    <input type="checkbox"
+                           class="custom-check"
+                           th:checked="${dailyLogDto.status?.name() eq 'DONE'}"
+                           onchange="toggleStatus(this)">
+                </td>
 
-        <td>
-            <span th:if="${dailyLogDto.routineType?.name() eq 'CHECK'}">
-                1회
-                <input type="hidden" class="achieved-value" value="1">
-            </span>
-            <span th:unless="${dailyLogDto.routineType?.name() eq 'CHECK'}">
-                <input type="number" class="achieved-value"
-                       th:value="${dailyLogDto.achievedValue}"
-                       th:disabled="${dailyLogDto.status?.name() eq 'DONE'}"
-                       style="width: 60px; padding: 3px;">
-            </span>
-        </td>
-    </tr>
+                <td>
+                    <span class="routine-name" th:text="${dailyLogDto.title}">루틴명</span>
+                </td>
 
-    </tbody>
-</table>
+                <td class="value-cell">
+                    <!-- 체크형: 고정 텍스트 -->
+                    <span th:if="${dailyLogDto.routineType?.name() eq 'CHECK'}">
+                        <span class="check-label">완료 1회</span>
+                        <input type="hidden" class="achieved-value" value="1">
+                    </span>
+                    <!-- 그 외: 숫자 입력 -->
+                    <span th:unless="${dailyLogDto.routineType?.name() eq 'CHECK'}">
+                        <input type="number"
+                               class="achieved-value"
+                               th:value="${dailyLogDto.achievedValue}"
+                               th:disabled="${dailyLogDto.status?.name() eq 'DONE'}"
+                               min="0">
+                    </span>
+                </td>
+            </tr>
 
-<br><br>
+            </tbody>
+        </table>
+    </div>
 
-<h2>일일 현황 요약</h2>
+</div><!-- /.page-wrapper -->
 
-<table>
-    <thead>
-    <tr>
-        <th class="text-center">완료</th>
-        <th class="text-center">전체</th>
-        <th class="text-center">달성률</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td id="completedCountView" class="text-center" th:text="${completedCount != null ? completedCount : 0}" style="font-size: 1.2em; font-weight: bold; color: #4CAF50;">0</td>
-        <td id="totalCountView" class="text-center" th:text="${totalCount != null ? totalCount : 0}" style="font-size: 1.2em; font-weight: bold;">0</td>
-        <td id="achievementRateView" class="text-center" th:text="${achievementRate != null ? achievementRate : 0} + '%'" style="font-size: 1.2em; font-weight: bold; color: #2196F3;">0%</td>
-    </tr>
-    </tbody>
-</table>
 
 <script>
-    let totalCount = parseInt(document.getElementById('totalCountView').innerText) || 0;
+    // ─── 테마 토글 ───────────────────────────────
+    (function initTheme() {
+        const saved = localStorage.getItem('theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+        updateThemeIcon();
+    })();
+
+    function toggleTheme() {
+        const html    = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        let next;
+        if (!current) {
+            next = sysDark ? 'light' : 'dark';
+        } else {
+            next = current === 'dark' ? 'light' : 'dark';
+        }
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+        const btn     = document.getElementById('themeToggle');
+        if (!btn) return;
+        const html    = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark  = current === 'dark' || (!current && sysDark);
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title       = isDark ? '라이트 모드로 전환' : '다크 모드로 전환';
+    }
+
+    // ─── 통계 초기값 ─────────────────────────────
+    let totalCount     = parseInt(document.getElementById('totalCountView').innerText)     || 0;
     let completedCount = parseInt(document.getElementById('completedCountView').innerText) || 0;
 
+    // ─── 체크박스 토글 ───────────────────────────
     async function toggleStatus(checkbox) {
-        const tr = checkbox.closest('tr');
-        const seqNo = tr.getAttribute('data-seq-no');
+        const tr        = checkbox.closest('tr');
+        const seqNo     = tr.getAttribute('data-seq-no');
         const isChecked = checkbox.checked;
-        const status = isChecked ? 'DONE' : 'TODO';
+        const status    = isChecked ? 'DONE' : 'TODO';
+        const inputEl   = tr.querySelector('.achieved-value');
 
-        const inputEl = tr.querySelector('.achieved-value');
-
-        // [중요] 실패 시 롤백을 위해 현재(변경 전) 값을 기억해둠
         const originalValue = inputEl ? inputEl.value : 0;
 
-        if (isChecked && originalValue === "0"){
-            alert('오늘 달성한 수치를 입력해야 해!');
+        if (isChecked && originalValue === "0") {
+            alert('오늘 달성한 수치를 입력해야 해요!');
+            checkbox.checked = false;
             return;
         }
 
-        // 서버로 보낼 새로운 달성 수치 결정 (체크 해제 시 0)
         const targetAchievedValue = isChecked ? originalValue : 0;
 
-        // --- 1. 낙관적 업데이트: UI 즉시 변경 ---
+        // 낙관적 업데이트
+        tr.classList.toggle('row-done', isChecked);
         if (inputEl && inputEl.type === 'number') {
-            inputEl.disabled = isChecked; // 체크되면 비활성화, 풀리면 활성화
-            if (!isChecked) {
-                inputEl.value = 0; // 체크 해제 시 화면의 수치도 0으로 변경
-            }
+            inputEl.disabled = isChecked;
+            if (!isChecked) inputEl.value = 0;
         }
-
         updateStatsUI(isChecked ? 1 : -1);
 
-        // --- 2. 백엔드 API 호출 ---
         try {
-            const response = await fetch(`/api/routine/update`, {
+            const response = await fetch('/api/routine/update', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    seqNo: seqNo,
-                    status: status,
-                    achievedValue: Number(targetAchievedValue) // 0 또는 입력된 값 전송
+                    seqNo:         seqNo,
+                    status:        status,
+                    achievedValue: Number(targetAchievedValue)
                 })
             });
-
-            if (!response.ok) {
-                throw new Error('API update failed');
-            }
+            if (!response.ok) throw new Error('API update failed');
 
         } catch (error) {
             console.error('Update failed:', error);
-            alert('서버와 통신하는 데 문제가 발생했어. 수치를 원래대로 되돌릴게!');
+            alert('서버와 통신하는 데 문제가 발생했어요. 되돌릴게요!');
 
-            // --- 3. 실패 시 롤백 (원상복구) ---
-            checkbox.checked = !isChecked; // 체크박스 상태 원복
-
+            // 롤백
+            checkbox.checked = !isChecked;
+            tr.classList.toggle('row-done', !isChecked);
             if (inputEl && inputEl.type === 'number') {
-                inputEl.disabled = !isChecked; // 활성/비활성 상태 원복
-                inputEl.value = originalValue; // [중요] 0으로 바꿨던 수치를 원래 값으로 복구!
+                inputEl.disabled = !isChecked;
+                inputEl.value    = originalValue;
             }
-
-            updateStatsUI(!isChecked ? 1 : -1); // 통계 수치 원복
+            updateStatsUI(!isChecked ? 1 : -1);
         }
     }
 
     function updateStatsUI(changeCount) {
         if (totalCount === 0) return;
-
-        completedCount += changeCount;
-
-        if (completedCount < 0) completedCount = 0;
-        if (completedCount > totalCount) completedCount = totalCount;
-
-        const achievementRate = Math.round((completedCount / totalCount) * 100);
-
-        document.getElementById('completedCountView').innerText = completedCount;
-        document.getElementById('achievementRateView').innerText = achievementRate + '%';
+        completedCount = Math.max(0, Math.min(totalCount, completedCount + changeCount));
+        const rate = Math.round((completedCount / totalCount) * 100);
+        document.getElementById('completedCountView').innerText   = completedCount;
+        document.getElementById('achievementRateView').innerText  = rate + '%';
     }
 </script>
 

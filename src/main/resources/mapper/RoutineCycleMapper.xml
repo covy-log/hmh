@@ -6,13 +6,14 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="seqNo" keyColumn="seq_no">
         INSERT INTO routine_cycle
-        (routine_seq_no, member_seq_no, cycle_number, start_ymd, end_ymd, target_value)
-        VALUES(#{routineSeqNo}, #{memberSeqNo}, #{cycleNumber}, #{startYmd}, #{endYmd}, #{targetValue})
+        (routine_seq_no, member_seq_no, cycle_number, start_ymd, end_ymd, target_value, daily_limit)
+        VALUES(#{routineSeqNo}, #{memberSeqNo}, #{cycleNumber}, #{startYmd}, #{endYmd}, #{targetValue}, #{dailyLimit})
     </insert>
 
     <update id="update" parameterType="RoutineCycle">
         UPDATE routine_cycle
         SET target_value = #{targetValue},
+            daily_limit = #{dailyLimit}
             current_achieved_value = #{currentAchievedValue}
         WHERE
             seq_no = #{seqNo}

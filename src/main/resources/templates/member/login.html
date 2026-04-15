@@ -3,47 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
+    <link rel="stylesheet" href="/css/routine.css">
+    <style>
+        /* 로그인 페이지 전용 스타일 */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-box {
+            width: 100%;
+            max-width: 420px;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .auth-title {
+            font-family: var(--font-label);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .auth-subtitle {
+            font-size: 14px;
+            color: var(--text-hint);
+        }
+        
+        .auth-form {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group:last-of-type {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-family: var(--font-label);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface-sub);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 15px;
+            transition: all var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--surface);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-hint);
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-soft);
+        }
+        
+        .auth-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+        
+        .auth-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+        
+        .auth-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-<h2>로그인</h2>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1 class="auth-title">로그인</h1>
+                <p class="auth-subtitle">계정에 로그인하세요</p>
+            </div>
+            
+            <div class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="loginId">아이디</label>
+                    <input type="text" id="loginId" class="form-input" placeholder="아이디를 입력하세요">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">비밀번호</label>
+                    <input type="password" id="password" class="form-input" placeholder="비밀번호를 입력하세요">
+                </div>
+                
+                <button class="btn-submit" onclick="login()" style="margin-top: 24px;">로그인</button>
+            </div>
+            
+            <div class="auth-footer">
+                <span class="auth-text">아직 회원이 아니신가요? </span>
+                <a href="/signup" class="auth-link">회원가입 하러가기</a>
+            </div>
+        </div>
+    </div>
 
-<div>
-    <input type="text" id="loginId" placeholder="아이디"><br><br>
-    <input type="password" id="password" placeholder="비밀번호"><br><br>
-    <button onclick="login()">로그인</button>
-</div>
+    <script>
+        async function login() {
+            // 1. 입력된 값 가져오기
+            const loginId = document.getElementById('loginId').value;
+            const password = document.getElementById('password').value;
 
-<br>
-<a href="/signup">아직 회원이 아니신가요? 회원가입 하러가기</a>
+            // 2. 서버로 JSON 데이터 전송 (우리가 만든 MemberApiController 호출)
+            const response = await fetch('/api/members/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    loginId: loginId,
+                    password: password
+                })
+            });
 
-<script>
-    async function login() {
-        // 1. 입력된 값 가져오기
-        const loginId = document.getElementById('loginId').value;
-        const password = document.getElementById('password').value;
-
-        // 2. 서버로 JSON 데이터 전송 (우리가 만든 MemberApiController 호출)
-        const response = await fetch('/api/members/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                loginId: loginId,
-                password: password
-            })
-        });
-
-        // 3. 결과 처리
-        if (response.ok) { // HTTP 상태 코드가 200~299일 때
-            alert('로그인 성공!');
-            // 로그인 성공 후 메인 페이지로 이동 (나중에 main.html을 만들면 돼)
-            window.location.href = '/dailyLog';
-        } else {
-            const errorMessage = await response.text();
-            alert('로그인 실패: ' + errorMessage);
+            // 3. 결과 처리
+            if (response.ok) { // HTTP 상태 코드가 200~299일 때
+                alert('로그인 성공!');
+                // 로그인 성공 후 메인 페이지로 이동 (나중에 main.html을 만들면 돼)
+                window.location.href = '/dailyLog';
+            } else {
+                const errorMessage = await response.text();
+                alert('로그인 실패: ' + errorMessage);
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>

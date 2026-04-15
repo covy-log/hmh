@@ -28,6 +28,11 @@ public class RoutineSettingDto {
     private BigDecimal targetValue;
 
     /**
+     * 일일 한도 수치 (예: 20시간, 4회)
+     */
+    private BigDecimal dailyLimit;
+
+    /**
      * 루틴 타입 (예: CHECK, COUNT, TIME)
      */
     private RoutineType routineType;

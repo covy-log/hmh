@@ -17,6 +17,7 @@
             r.routine_type,
             dl.status,
             dl.achieved_value,
+            rc.daily_limit,
             rc.target_value
         FROM daily_log dl
         INNER JOIN routine_cycle rc ON dl.cycle_seq_no = rc.seq_no

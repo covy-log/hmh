@@ -50,7 +50,7 @@ public class DailyLog {
      * - 체크형(단순 완료): 완료했으면 1, 아니면 0으로 처리.
      */
     @Builder.Default
-    private BigDecimal achievedValue;
+    private BigDecimal achievedValue = BigDecimal.valueOf(0);
 
     /**
      * 사용자가 실제로 '완료' 처리를 한 시간

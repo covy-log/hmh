@@ -44,6 +44,7 @@ public class RoutineApiController {
                     .title(routineSettingDto.getTitle())
                     .routineType(routineSettingDto.getRoutineType())
                     .targetValue(routineSettingDto.getTargetValue())
+                    .dailyLimit(routineSettingDto.getDailyLimit())
                     .intervalWeeks(routineSettingDto.getIntervalWeeks())
                     .daysOfWeek(routineSettingDto.getDaysOfWeek()) // 1,3,5
                     .startYmd(routineSettingDto.getStartYmd())
@@ -69,6 +70,7 @@ public class RoutineApiController {
                         .startYmd(startYmd)
                         .endYmd(endYmd)
                         .targetValue(routine.getTargetValue())
+                        .dailyLimit(routine.getDailyLimit())
                         .build();
 
                 routineCycleService.save(routineCycle);

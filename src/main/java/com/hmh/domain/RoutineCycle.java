@@ -59,6 +59,11 @@ public class RoutineCycle {
     private BigDecimal currentAchievedValue;
 
     /**
+     * 일일 한도 수치 (예: 20시간, 4회)
+     */
+    private BigDecimal dailyLimit;
+
+    /**
      * 주기 상태
      */
     @Builder.Default

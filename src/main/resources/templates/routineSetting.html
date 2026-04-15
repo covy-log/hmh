@@ -2,332 +2,435 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>루틴 설정</title>
-    <style>
-        /* 표를 깔끔하게 보기 위한 최소한의 스타일 */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; width: 150px; }
-        .hidden { display: none; }
-        /* 탭 버튼 스타일 (선택사항이지만 깔끔하게 보이도록 추가) */
-        button { padding: 8px 15px; margin-right: 5px; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/routine.css}" href="/css/routine.css">
 </head>
 <body>
 
-<div>
-    <button type="button" onclick="location.href='/dailyLog'">일일 루틴</button>
-    <button type="button" onclick="location.href='/routineCycleStatus'">루틴 현황</button>
-    <button type="button" style="font-weight: bold;">루틴 설정</button>
-</div>
+<div class="page-wrapper">
 
-<hr>
+    <!-- ── Top Navigation ── -->
+    <nav class="top-nav">
+        <div class="nav-tabs">
+            <button type="button" class="nav-btn" onclick="location.href='/dailyLog'">일일 루틴</button>
+            <button type="button" class="nav-btn" onclick="location.href='/routineCycleStatus'">루틴 현황</button>
+            <button type="button" class="nav-btn active">루틴 설정</button>
+        </div>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="테마 전환">🌙</button>
+    </nav>
 
-<h2>새로운 루틴 등록</h2>
+    <!-- ══════════════════════════
+         새로운 루틴 등록 폼
+    ══════════════════════════ -->
+    <h2 class="section-title">새로운 루틴 등록</h2>
 
-<table>
-    <tbody>
-    <tr>
-        <th>루틴명</th>
-        <td><input type="text" id="title" placeholder="예: 아침 조깅"></td>
-    </tr>
-    <tr>
-        <th>루틴 타입</th>
-        <td>
-            <select id="routineType">
-                <option value="CHECK">yes/no</option>
-                <option value="COUNT">회</option>
-                <option value="TIME">시간</option>
-                <option value="DISTANCE">km</option>
-            </select>
-        </td>
-    </tr>
-    <tr id="targetValueRow" class="hidden">
-        <th>목표 수치</th>
-        <td><input type="number" id="targetValue" placeholder="숫자 입력"></td>
-    </tr>
-    <tr>
-        <th>반복 주기</th>
-        <td>
-            <div id="checkRepeatArea">
-                <input type="number" id="intervalWeeks" value="1" min="1" style="width: 50px;"> 주 간격으로 반복
+    <div class="form-card">
+
+        <!-- 1. 루틴명 -->
+        <div class="field-row">
+            <span class="field-label">루틴명</span>
+            <div class="field-content">
+                <input type="text" id="title" placeholder="예: 아침 조깅">
             </div>
-            <div id="otherRepeatArea" class="hidden">
-                매주 (기본값)
+        </div>
+
+        <!-- 2. 수행 요일 -->
+        <div class="field-row">
+            <span class="field-label">수행 요일</span>
+            <div class="field-content">
+                <div class="days-row">
+                    <label class="day-chip any-day">
+                        <input type="checkbox" id="checkAnyDay" onchange="onAnyDayChange()" checked>
+                        매일
+                    </label>
+                    <span class="sep"></span>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="1" onchange="onDayCheckboxChange()" checked>월</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="2" onchange="onDayCheckboxChange()" checked>화</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="3" onchange="onDayCheckboxChange()" checked>수</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="4" onchange="onDayCheckboxChange()" checked>목</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="5" onchange="onDayCheckboxChange()" checked>금</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="6" onchange="onDayCheckboxChange()" checked>토</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="7" onchange="onDayCheckboxChange()" checked>일</label>
+                </div>
             </div>
-        </td>
-    </tr>
-    <tr>
-        <th>수행 요일</th>
-        <td>
-            <label><input type="checkbox" id="checkAllDays" onclick="toggleAllDays()" checked> 매일</label> |
-            <label><input type="checkbox" class="day-checkbox" value="1" onclick="updateAllDaysCheckbox()" checked> 월</label>
-            <label><input type="checkbox" class="day-checkbox" value="2" onclick="updateAllDaysCheckbox()" checked> 화</label>
-            <label><input type="checkbox" class="day-checkbox" value="3" onclick="updateAllDaysCheckbox()" checked> 수</label>
-            <label><input type="checkbox" class="day-checkbox" value="4" onclick="updateAllDaysCheckbox()" checked> 목</label>
-            <label><input type="checkbox" class="day-checkbox" value="5" onclick="updateAllDaysCheckbox()" checked> 금</label>
-            <label><input type="checkbox" class="day-checkbox" value="6" onclick="updateAllDaysCheckbox()" checked> 토</label>
-            <label><input type="checkbox" class="day-checkbox" value="7" onclick="updateAllDaysCheckbox()" checked> 일</label>
-        </td>
-    </tr>
-    <tr>
-        <th>시작 주 선택</th>
-        <td>
-            <input type="week" id="startYmd">
-            <span style="font-size: 0.8em; color: gray;">*기본값: 이번 주</span>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        </div>
 
-<button type="button" onclick="saveRoutine()" style="padding: 10px 20px; cursor: pointer;">루틴 등록하기</button>
+        <!-- 3. 루틴 타입 -->
+        <div class="field-row">
+            <span class="field-label">루틴 타입</span>
+            <div class="field-content">
+                <div class="type-options">
+                    <label class="type-chip">
+                        <input type="radio" name="routineType" value="CHECK" onchange="onTypeChange()" checked>
+                        체크형 횟수 <small>[1일 1회]</small>
+                    </label>
+                    <label class="type-chip">
+                        <input type="radio" name="routineType" value="COUNT" onchange="onTypeChange()">
+                        누적형 횟수 <small>[1일 N회]</small>
+                    </label>
+                    <label class="type-chip">
+                        <input type="radio" name="routineType" value="TIME" onchange="onTypeChange()">
+                        시간
+                    </label>
+                    <label class="type-chip">
+                        <input type="radio" name="routineType" value="DISTANCE" onchange="onTypeChange()">
+                        km
+                    </label>
+                </div>
+            </div>
+        </div>
 
-<br><br>
-<hr>
+        <!-- 4. 주간 목표 수치 -->
+        <div class="field-row">
+            <span class="field-label">주간 목표</span>
+            <div class="field-content" id="goalCell">
 
-<h2>등록된 루틴 리스트</h2>
+                <!-- 체크형 -->
+                <div id="goal-CHECK" class="goal-block visible">
+                    <div class="goal-main">
+                        <input type="number" id="checkGoal" min="1" value="1">
+                        <span class="unit">회 / 주</span>
+                        <span class="check-max-hint" id="checkMaxHint">(최대 7회)</span>
+                    </div>
+                    <div class="error-msg" id="checkGoalError">선택한 요일 수를 초과할 수 없어요.</div>
+                </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>루틴명</th>
-        <th>타입</th>
-        <th>목표 수치</th>
-        <th>반복 주기</th>
-        <th>수행 요일</th>
-        <th>시작 주</th>
-    </tr>
-    </thead>
-    <tbody id="routineListBody">
-    <tr th:if="${#lists.isEmpty(routineList)}" id="emptyMessageRow">
-        <td colspan="6" style="text-align: center;">등록된 루틴이 없어! 첫 루틴을 등록해 봐.</td>
-    </tr>
+                <!-- 누적형 -->
+                <div id="goal-COUNT" class="goal-block">
+                    <div class="goal-main">
+                        <input type="number" id="countGoal" min="1" value="7">
+                        <span class="unit">회 / 주</span>
+                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('COUNT')">1일 최대 한도 ▾</button>
+                    </div>
+                    <div class="daily-limit-area" id="limit-COUNT">
+                        <span class="limit-label">1일 최대</span>
+                        <input type="number" id="countLimit" min="1" value="1">
+                        <span class="unit">회</span>
+                    </div>
+                    <div class="error-msg" id="countLimitError">1일 최대 한도가 주간 목표보다 클 수 없어요.</div>
+                </div>
 
-    <tr th:unless="${#lists.isEmpty(routineList)}" th:each="routine : ${routineList}">
-        <td th:text="${routine.title}">루틴명</td>
-        <td th:text="${routine.routineType}">타입</td>
-        <td th:text="${routine.targetValue != null ? routine.targetValue : 1}">수치</td>
-        <td th:text="${routine.intervalWeeks == 1 ? '매주' : routine.intervalWeeks + '주 간격'}">반복주기</td>
-        <td th:text="${routine.daysOfWeek}">월,수,금</td>
-        <td th:text="${routine.startYmd}">2026-W14</td>
-    </tr>
-    </tbody>
-</table>
+                <!-- 시간 -->
+                <div id="goal-TIME" class="goal-block">
+                    <div class="goal-main">
+                        <input type="number" class="input-sm" id="timeGoalHour" min="0" value="1">
+                        <span class="unit">시간</span>
+                        <input type="number" class="input-sm" id="timeGoalMin" min="0" max="59" value="0">
+                        <span class="unit">분 / 주</span>
+                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('TIME')">1일 최대 한도 ▾</button>
+                    </div>
+                    <div class="daily-limit-area" id="limit-TIME">
+                        <span class="limit-label">1일 최대</span>
+                        <input type="number" class="input-sm" id="timeLimitHour" min="0" value="0">
+                        <span class="unit">시간</span>
+                        <input type="number" class="input-sm" id="timeLimitMin" min="0" max="59" value="30">
+                        <span class="unit">분</span>
+                    </div>
+                    <div class="error-msg" id="timeLimitError">1일 최대 한도가 주간 목표보다 클 수 없어요.</div>
+                </div>
+
+                <!-- km -->
+                <div id="goal-DISTANCE" class="goal-block">
+                    <div class="goal-main">
+                        <input type="number" id="distGoal" min="0.01" step="0.01" value="5.00" style="width:90px;">
+                        <span class="unit">km / 주</span>
+                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('DISTANCE')">1일 최대 한도 ▾</button>
+                    </div>
+                    <div class="daily-limit-area" id="limit-DISTANCE">
+                        <span class="limit-label">1일 최대</span>
+                        <input type="number" id="distLimit" min="0.01" step="0.01" value="1.00" style="width:90px;">
+                        <span class="unit">km</span>
+                    </div>
+                    <div class="error-msg" id="distLimitError">1일 최대 한도가 주간 목표보다 클 수 없어요.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 5. 시작 주 -->
+        <div class="field-row">
+            <span class="field-label">시작 주</span>
+            <div class="field-content">
+                <input type="week" id="startYmd">
+                <span class="input-hint">* 기본값: 이번 주</span>
+            </div>
+        </div>
+
+        <input type="hidden" id="intervalWeeks" value="1">
+
+        <button type="button" class="btn-submit" onclick="saveRoutine()">루틴 등록하기</button>
+    </div>
+
+    <!-- ══════════════════════════
+         등록된 루틴 리스트
+    ══════════════════════════ -->
+    <hr class="divider">
+    <h2 class="section-title">등록된 루틴 리스트</h2>
+
+    <div class="list-card">
+        <table class="routine-table">
+            <thead>
+            <tr>
+                <th>루틴명</th>
+                <th>타입</th>
+                <th>주간 목표</th>
+                <th>1일 최대</th>
+                <th class="col-hide-sm">수행 요일</th>
+                <th class="col-hide-sm">시작 주</th>
+            </tr>
+            </thead>
+            <tbody id="routineListBody">
+
+            <tr th:if="${#lists.isEmpty(routineList)}" id="emptyMessageRow">
+                <td colspan="6">
+                    <div class="empty-state">
+                        <span class="empty-icon">📋</span>
+                        등록된 루틴이 없어요. 첫 루틴을 등록해 보세요!
+                    </div>
+                </td>
+            </tr>
+
+            <tr th:unless="${#lists.isEmpty(routineList)}" th:each="routine : ${routineList}">
+                <td th:text="${routine.title}"></td>
+                <td><span class="type-badge" th:text="${routine.routineType}"></span></td>
+                <td th:text="${routine.targetValue}"></td>
+                <td th:text="${routine.dailyLimit != null ? routine.dailyLimit : '-'}"></td>
+                <td class="col-hide-sm" th:text="${routine.daysOfWeek}"></td>
+                <td class="col-hide-sm start-week" th:text="${routine.startYmd}"></td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div><!-- /.page-wrapper -->
+
 
 <script>
+    // ─── 테마 토글 ───────────────────────────────
+    (function initTheme() {
+        const saved = localStorage.getItem('theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+        updateThemeIcon();
+    })();
 
-    // 페이지 로드 시 이번 주 날짜를 기본값으로 세팅 (자바스크립트로 이번 주 ISO 문자열 구하기)
-    window.onload = function() {
-        toggleAllDays();
+    function toggleTheme() {
+        const html    = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const next    = (current === 'dark' || (!current && sysDark)) ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeIcon();
+    }
 
-        // 적용
-        const weekStr = getISOWeekString(new Date());
-        document.getElementById('startYmd').value = weekStr;
+    function updateThemeIcon() {
+        const btn     = document.getElementById('themeToggle');
+        if (!btn) return;
+        const html    = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark  = current === 'dark' || (!current && sysDark);
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title       = isDark ? '라이트 모드로 전환' : '다크 모드로 전환';
+    }
+
+    // ─── 페이지 초기화 ───────────────────────────
+    window.onload = function () {
+        document.getElementById('startYmd').value = getISOWeekString(new Date());
+        updateCheckMaxHint();
     };
 
-    // 서버로 데이터 전송 및 리스트 즉시 업데이트 (새로고침 없음!)
-    async function saveRoutine() {
-        const title = document.getElementById('title').value;
-        const routineType = document.getElementById('routineType').value;
-        const targetValue = document.getElementById('targetValue').value;
-        const startYmd = document.getElementById('startYmd').value;
+    // ─── 요일 체크박스 ───────────────────────────
+    function onAnyDayChange() {
+        const isChecked = document.getElementById('checkAnyDay').checked;
+        document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = isChecked);
+        updateCheckMaxHint();
+    }
+    function onDayCheckboxChange() {
+        const all     = document.querySelectorAll('.day-checkbox');
+        const checked = document.querySelectorAll('.day-checkbox:checked');
+        document.getElementById('checkAnyDay').checked = (all.length === checked.length);
+        updateCheckMaxHint();
+    }
+    function getSelectedDayCount() { return document.querySelectorAll('.day-checkbox:checked').length; }
+    function getSelectedDaysStr() {
+        const vals = [];
+        document.querySelectorAll('.day-checkbox:checked').forEach(cb => vals.push(cb.value));
+        return vals.join(',');
+    }
 
-        let intervalWeeks = 1; // 기본값
+    // ─── 루틴 타입 ───────────────────────────────
+    function onTypeChange() {
+        document.querySelectorAll('.goal-block').forEach(el => el.classList.remove('visible'));
+        document.getElementById('goal-' + getSelectedType()).classList.add('visible');
+        clearErrors();
+    }
+    function getSelectedType() {
+        return document.querySelector('input[name="routineType"]:checked').value;
+    }
 
-        if (routineType === 'CHECK') {
-            intervalWeeks = document.getElementById('intervalWeeks').value;
+    // ─── 체크형 힌트 ─────────────────────────────
+    function updateCheckMaxHint() {
+        const cnt = getSelectedDayCount();
+        document.getElementById('checkMaxHint').textContent = '(최대 ' + cnt + '회)';
+        const input = document.getElementById('checkGoal');
+        input.max = cnt;
+        if (parseInt(input.value) > cnt) input.value = cnt;
+    }
+
+    // ─── 한도 토글 ───────────────────────────────
+    function toggleLimit(type) {
+        document.getElementById('limit-' + type).classList.toggle('open');
+    }
+
+    // ─── 유효성 검사 ─────────────────────────────
+    function clearErrors() {
+        document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('visible'));
+    }
+    function showError(id) { document.getElementById(id).classList.add('visible'); }
+    function toMinutes(h, m) { return parseInt(h || 0) * 60 + parseInt(m || 0); }
+    function toMeters(km)    { return Math.round(parseFloat(km || 0) * 1000); }
+
+    function validate(type) {
+        clearErrors();
+        if (type === 'CHECK') {
+            const val = parseInt(document.getElementById('checkGoal').value);
+            const max = getSelectedDayCount();
+            if (!val || val < 1 || val > max) { showError('checkGoalError'); return false; }
         }
-
-        // 체크된 요일들 배열로 모으기
-        const daysOfWeek = [];
-        document.querySelectorAll('.day-checkbox:checked').forEach(cb => {
-            daysOfWeek.push(cb.value);
-        });
-
-        if (!title) {
-            alert('루틴명을 입력해 줘!');
-            return;
-        }
-        if (daysOfWeek.length === 0) {
-            alert('수행할 요일을 하나 이상 선택해 줘!');
-            return;
-        }
-
-        // 적용 예시
-        const selectedWeek = document.getElementById('startYmd').value; // "2026-W15"
-        const formattedDate = getMondayFromWeekStr(selectedWeek); // "2026-04-06" 변환 완료!
-
-        // 서버로 보낼 JSON 데이터 만들기
-        const requestData = {
-            title: title,
-            routineType: routineType,
-            targetValue: targetValue,
-            intervalWeeks: intervalWeeks,
-            daysOfWeek: daysOfWeek.join(','),
-            startYmd: formattedDate
-        };
-
-        try {
-            // [서버 API 호출 부분]
-            // 실제 백엔드 컨트롤러 경로('/api/routineList')에 맞게 나중에 수정해 줘!
-            const response = await fetch('/api/routine/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestData)
-            });
-
-            if (response.ok) {
-                // 서버 저장 성공 시 화면 리스트에 한 줄 추가 (새로고침 안함)
-                addRoutineToList(requestData);
-                alert('루틴이 등록되었어!');
-
-                // 입력 폼 초기화
-                document.getElementById('title').value = '';
-                document.getElementById('targetValue').value = '';
-                document.getElementById('checkAllDays').checked = false;
-                toggleAllDays(); // 요일 체크박스 다 풀기
-            } else {
-                alert('등록에 실패했어. 다시 시도해 봐.');
+        if (type === 'COUNT') {
+            const goal = parseInt(document.getElementById('countGoal').value);
+            if (!goal || goal < 1) { showError('countLimitError'); return false; }
+            if (document.getElementById('limit-COUNT').classList.contains('open')) {
+                const limit = parseInt(document.getElementById('countLimit').value);
+                if (limit && limit > goal) { showError('countLimitError'); return false; }
             }
-        } catch (error) {
-            console.error('에러 발생:', error);
-            // 프론트엔드 테스트용 (백엔드 없어도 리스트 추가되는 거 보려면 이 부분 주석 해제)
-            // addRoutineToList(requestData);
         }
-    }
-
-
-
-    // [기타 함수 목록]
-
-    // ISO 8601 기준 주차 계산 함수
-    function getISOWeekString(date) {
-        // 타임존 오차를 막기 위해 UTC 기준으로 날짜 객체 복사
-        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-
-        // 현재 요일 구하기 (월=1 ~ 일=7, 일요일이 0이므로 7로 보정)
-        const dayNum = d.getUTCDay() || 7;
-
-        // ISO 표준 기준인 '해당 주의 목요일'로 날짜 이동 (4 = 목요일)
-        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-
-        // 목요일이 속한 연도의 1월 1일 구하기
-        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-
-        // 1월 1일부터 목요일까지 며칠 지났는지 계산 후 7로 나누어 주차 산정
-        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-
-        // YYYY-Www 포맷으로 반환 (예: 2026-W15)
-        return d.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
-    }
-
-    // 'YYYY-Www' 형식을 받아서 그 주의 월요일 날짜 'YYYY-MM-DD'로 반환하는 함수
-    function getMondayFromWeekStr(weekStr) {
-        if (!weekStr) return null;
-
-        const year = parseInt(weekStr.substring(0, 4));
-        const week = parseInt(weekStr.substring(6, 8));
-
-        // ISO 8601 표준 기준: 1월 4일은 무조건 그 해의 1주차에 포함됨
-        const jan4 = new Date(year, 0, 4);
-        const jan4Day = jan4.getDay() || 7; // 요일 (1:월 ~ 7:일)
-
-        // 1주차의 월요일 날짜 구하기
-        const firstMonday = new Date(year, 0, 4 - jan4Day + 1);
-
-        // 타겟 주차(week)만큼 날짜 더하기
-        const targetMonday = new Date(firstMonday.getTime() + (week - 1) * 7 * 24 * 60 * 60 * 1000);
-
-        // YYYY-MM-DD 포맷으로 맞추기
-        const yyyy = targetMonday.getFullYear();
-        const mm = String(targetMonday.getMonth() + 1).padStart(2, '0');
-        const dd = String(targetMonday.getDate()).padStart(2, '0');
-
-        return `${yyyy}-${mm}-${dd}`;
-    }
-
-    // 루틴 타입 변경 시 입력 폼 제어
-    // function handleTypeChange() {
-    //     const type = document.getElementById('routineType').value;
-    //     const targetValueRow = document.getElementById('targetValueRow');
-    //     const checkRepeatArea = document.getElementById('checkRepeatArea');
-    //     const otherRepeatArea = document.getElementById('otherRepeatArea');
-    //
-    //     if (type === 'CHECK') {
-    //         targetValueRow.classList.add('hidden'); // 목표 수치 숨김
-    //         checkRepeatArea.classList.remove('hidden'); // N주 간격 보임
-    //         otherRepeatArea.classList.add('hidden'); // 매주 고정 숨김
-    //     } else {
-    //         targetValueRow.classList.remove('hidden'); // 목표 수치 보임
-    //         checkRepeatArea.classList.add('hidden'); // N주 간격 숨김
-    //         otherRepeatArea.classList.remove('hidden'); // 매주 고정 보임
-    //     }
-    // }
-
-    // 매일 체크박스 제어
-    function toggleAllDays() {
-        const isChecked = document.getElementById('checkAllDays').checked;
-        const checkboxes = document.querySelectorAll('.day-checkbox');
-        checkboxes.forEach(cb => cb.checked = isChecked);
-    }
-    // 개별 요일 클릭 시 '매일' 체크박스 상태 자동 변경
-    function updateAllDaysCheckbox() {
-        const checkAllDays = document.getElementById('checkAllDays');
-        const checkboxes = document.querySelectorAll('.day-checkbox');
-        const checkedBoxes = document.querySelectorAll('.day-checkbox:checked');
-
-        // 전체 요일 개수(7개)와 현재 체크된 요일 개수가 같으면 '매일' 체크, 아니면 해제
-        if (checkboxes.length === checkedBoxes.length) {
-            checkAllDays.checked = true;
-        } else {
-            checkAllDays.checked = false;
+        if (type === 'TIME') {
+            const goalMin = toMinutes(document.getElementById('timeGoalHour').value, document.getElementById('timeGoalMin').value);
+            if (goalMin < 1) { showError('timeLimitError'); return false; }
+            if (document.getElementById('limit-TIME').classList.contains('open')) {
+                const lm = toMinutes(document.getElementById('timeLimitHour').value, document.getElementById('timeLimitMin').value);
+                if (lm > goalMin) { showError('timeLimitError'); return false; }
+            }
         }
+        if (type === 'DISTANCE') {
+            const goal = parseFloat(document.getElementById('distGoal').value);
+            if (!goal || goal <= 0) { showError('distLimitError'); return false; }
+            if (document.getElementById('limit-DISTANCE').classList.contains('open')) {
+                const limit = parseFloat(document.getElementById('distLimit').value);
+                if (limit && limit > goal) { showError('distLimitError'); return false; }
+            }
+        }
+        return true;
     }
 
-    // 표에 새로운 행을 추가하는 함수
+    // ─── 요청 데이터 빌드 ────────────────────────
+    function buildRequestData(type) {
+        const daysStr  = getSelectedDaysStr();
+        const startYmd = getMondayFromWeekStr(document.getElementById('startYmd').value);
+        let targetValue = null, dailyLimit = 0;
+        if (type === 'CHECK') { targetValue = parseInt(document.getElementById('checkGoal').value); dailyLimit = 1; }
+        if (type === 'COUNT') {
+            targetValue = parseInt(document.getElementById('countGoal').value);
+            if (document.getElementById('limit-COUNT').classList.contains('open'))
+                dailyLimit = parseInt(document.getElementById('countLimit').value) || null;
+        }
+        if (type === 'TIME') {
+            targetValue = toMinutes(document.getElementById('timeGoalHour').value, document.getElementById('timeGoalMin').value);
+            if (document.getElementById('limit-TIME').classList.contains('open')) {
+                const lm = toMinutes(document.getElementById('timeLimitHour').value, document.getElementById('timeLimitMin').value);
+                if (lm > 0) dailyLimit = lm;
+            }
+        }
+        if (type === 'DISTANCE') {
+            targetValue = toMeters(document.getElementById('distGoal').value);
+            if (document.getElementById('limit-DISTANCE').classList.contains('open')) {
+                const lm = toMeters(document.getElementById('distLimit').value);
+                if (lm > 0) dailyLimit = lm;
+            }
+        }
+        return { title: document.getElementById('title').value.trim(), routineType: type,
+            intervalWeeks: document.getElementById('intervalWeeks').value, targetValue, dailyLimit, daysOfWeek: daysStr, startYmd };
+    }
+
+    // ─── 저장 ────────────────────────────────────
+    async function saveRoutine() {
+        const title = document.getElementById('title').value.trim();
+        if (!title) { alert('루틴명을 입력해 줘!'); return; }
+        if (getSelectedDayCount() === 0) { alert('수행할 요일을 하나 이상 선택해 줘!'); return; }
+        const type = getSelectedType();
+        if (!validate(type)) return;
+        const requestData = buildRequestData(type);
+        try {
+            const response = await fetch('/api/routine/save', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestData)
+            });
+            if (response.ok) { addRoutineToList(requestData); alert('루틴이 등록됐어!'); resetForm(); }
+            else alert('등록에 실패했어. 다시 시도해 봐.');
+        } catch (e) { console.error(e); }
+    }
+
+    // ─── 폼 초기화 ───────────────────────────────
+    function resetForm() {
+        document.getElementById('title').value = '';
+        document.getElementById('checkAnyDay').checked = true;
+        onAnyDayChange();
+        document.querySelector('input[name="routineType"][value="CHECK"]').checked = true;
+        onTypeChange();
+        document.getElementById('startYmd').value = getISOWeekString(new Date());
+        clearErrors();
+    }
+
+    // ─── 목록 행 추가 ─────────────────────────────
     function addRoutineToList(data) {
         const tbody = document.getElementById('routineListBody');
-
-        // "등록된 루틴이 없어!" 메시지가 있으면 지워줌
-        const emptyMessage = document.getElementById('emptyMessageRow');
-        if (emptyMessage) {
-            emptyMessage.remove();
-        }
-
+        const empty = document.getElementById('emptyMessageRow');
+        if (empty) empty.remove();
         const tr = document.createElement('tr');
-
-        // 타입별로 보여줄 텍스트 가공
-        const targetDisplay = data.routineType === 'CHECK' ? '-' : data.targetValue;
-        const repeatDisplay = data.routineType === 'CHECK' ? data.intervalWeeks + '주 간격' : '매주';
-        const daysOfWeekDisplay = convertToDays(data.daysOfWeek);
-
         tr.innerHTML = `
             <td>${data.title}</td>
-            <td>${data.routineType}</td>
-            <td>${targetDisplay}</td>
-            <td>${repeatDisplay}</td>
-            <td>${daysOfWeekDisplay}</td>
-            <td>${data.startYmd}</td>
+            <td><span class="type-badge">${typeLabel(data.routineType)}</span></td>
+            <td>${formatGoal(data.routineType, data.targetValue)}</td>
+            <td>${data.dailyLimit ? formatGoal(data.routineType, data.dailyLimit) : '-'}</td>
+            <td class="col-hide-sm">${convertToDays(data.daysOfWeek)}</td>
+            <td class="col-hide-sm start-week">${data.startYmd}</td>
         `;
-
-        // 새로 추가된 데이터는 위로 올라오게 표의 맨 첫번째 자리에 삽입
         tbody.insertBefore(tr, tbody.firstChild);
     }
 
+    function typeLabel(t) { return { CHECK:'체크형', COUNT:'누적형', TIME:'시간', DISTANCE:'km' }[t] || t; }
+    function formatGoal(type, value) {
+        if (type === 'CHECK' || type === 'COUNT') return value + '회';
+        if (type === 'TIME') { const h = Math.floor(value/60), m = value%60; return (h>0?h+'시간 ':'')+m+'분'; }
+        if (type === 'DISTANCE') return (value/1000).toFixed(2)+'km';
+        return value;
+    }
     function convertToDays(str) {
-        const dayMap = {
-            '1': '월',
-            '2': '화',
-            '3': '수',
-            '4': '목',
-            '5': '금',
-            '6': '토',
-            '7': '일'
-        };
+        const map = {'1':'월','2':'화','3':'수','4':'목','5':'금','6':'토','7':'일'};
+        const days = str.split(',').map(n => map[n.trim()]||n.trim());
+        return days.length === 7 ? '매일' : days.join(', ');
+    }
 
-        return str.split(',')
-        .map(num => dayMap[num.trim()] || num.trim())
-        .join(', ');
+    // ─── ISO 주차 유틸 ───────────────────────────
+    function getISOWeekString(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const day = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - day);
+        const y = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        const w = Math.ceil((((d - y) / 86400000) + 1) / 7);
+        return d.getUTCFullYear() + '-W' + String(w).padStart(2, '0');
+    }
+    function getMondayFromWeekStr(weekStr) {
+        if (!weekStr) return null;
+        const year = parseInt(weekStr.substring(0, 4));
+        const week = parseInt(weekStr.substring(6, 8));
+        const jan4 = new Date(year, 0, 4);
+        const firstMonday = new Date(year, 0, 4 - (jan4.getDay()||7) + 1);
+        const target = new Date(firstMonday.getTime() + (week-1)*7*86400000);
+        return `${target.getFullYear()}-${String(target.getMonth()+1).padStart(2,'0')}-${String(target.getDate()).padStart(2,'0')}`;
     }
 </script>
 
