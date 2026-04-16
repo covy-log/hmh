@@ -354,13 +354,13 @@ input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-input[type="number"] {
-    -moz-appearance: textfield; /* Firefox */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path d="M5 0L0 5h10L5 0zm0 10l5-5H0l5 5z" fill="%23E5C259"/></svg>'); /* 커스텀 화살표 아이콘 */
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 10px 10px;
-}
+/*input[type="number"] {*/
+/*    -moz-appearance: textfield; !* Firefox *!*/
+/*    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path d="M5 0L0 5h10L5 0zm0 10l5-5H0l5 5z" fill="%23E5C259"/></svg>'); !* 커스텀 화살표 아이콘 *!*/
+/*    background-repeat: no-repeat;*/
+/*    background-position: right 8px center;*/
+/*    background-size: 10px 10px;*/
+/*}*/
 
 /* ── 달력 아이콘 디자인 개선 ── */
 input[type="week"]::-webkit-calendar-picker-indicator {

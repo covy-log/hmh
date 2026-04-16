@@ -74,7 +74,7 @@
                         시간
                     </label>
                     <label class="type-chip">
-                        <input type="radio" name="routineType" value="DISTANCE" onchange="onTypeChange()">
+                        <input type="radio" name="routineType" value="KM" onchange="onTypeChange()">
                         km
                     </label>
                 </div>
@@ -99,9 +99,9 @@
                 <!-- 누적형 -->
                 <div id="goal-COUNT" class="goal-block">
                     <div class="goal-main">
-                        <input type="number" id="countGoal" min="1" value="7">
+                        <input type="number" id="countGoal" min="1" value="10">
                         <span class="unit">회 / 주</span>
-                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('COUNT')">1일 최대 한도 ▾</button>
+                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('COUNT')">1일 최대 한도 설정</button>
                     </div>
                     <div class="daily-limit-area" id="limit-COUNT">
                         <span class="limit-label">1일 최대</span>
@@ -118,7 +118,7 @@
                         <span class="unit">시간</span>
                         <input type="number" class="input-sm" id="timeGoalMin" min="0" max="59" value="0">
                         <span class="unit">분 / 주</span>
-                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('TIME')">1일 최대 한도 ▾</button>
+                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('TIME')">1일 최대 한도 설정</button>
                     </div>
                     <div class="daily-limit-area" id="limit-TIME">
                         <span class="limit-label">1일 최대</span>
@@ -131,13 +131,13 @@
                 </div>
 
                 <!-- km -->
-                <div id="goal-DISTANCE" class="goal-block">
+                <div id="goal-km" class="goal-block">
                     <div class="goal-main">
                         <input type="number" id="distGoal" min="0.01" step="0.01" value="5.00" style="width:90px;">
                         <span class="unit">km / 주</span>
-                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('DISTANCE')">1일 최대 한도 ▾</button>
+                        <button type="button" class="toggle-limit-btn" onclick="toggleLimit('KM')">1일 최대 한도 설정</button>
                     </div>
-                    <div class="daily-limit-area" id="limit-DISTANCE">
+                    <div class="daily-limit-area" id="limit-KM">
                         <span class="limit-label">1일 최대</span>
                         <input type="number" id="distLimit" min="0.01" step="0.01" value="1.00" style="width:90px;">
                         <span class="unit">km</span>
@@ -204,7 +204,7 @@
         </table>
     </div>
 
-</div><!-- /.page-wrapper -->
+</div>
 
 
 <script>
@@ -316,10 +316,10 @@
                 if (lm > goalMin) { showError('timeLimitError'); return false; }
             }
         }
-        if (type === 'DISTANCE') {
+        if (type === 'KM') {
             const goal = parseFloat(document.getElementById('distGoal').value);
             if (!goal || goal <= 0) { showError('distLimitError'); return false; }
-            if (document.getElementById('limit-DISTANCE').classList.contains('open')) {
+            if (document.getElementById('limit-KM').classList.contains('open')) {
                 const limit = parseFloat(document.getElementById('distLimit').value);
                 if (limit && limit > goal) { showError('distLimitError'); return false; }
             }
@@ -332,7 +332,10 @@
         const daysStr  = getSelectedDaysStr();
         const startYmd = getMondayFromWeekStr(document.getElementById('startYmd').value);
         let targetValue = null, dailyLimit = 0;
-        if (type === 'CHECK') { targetValue = parseInt(document.getElementById('checkGoal').value); dailyLimit = 1; }
+        if (type === 'CHECK') {
+            targetValue = parseInt(document.getElementById('checkGoal').value);
+            dailyLimit = 1;
+        }
         if (type === 'COUNT') {
             targetValue = parseInt(document.getElementById('countGoal').value);
             if (document.getElementById('limit-COUNT').classList.contains('open'))
@@ -345,9 +348,9 @@
                 if (lm > 0) dailyLimit = lm;
             }
         }
-        if (type === 'DISTANCE') {
+        if (type === 'KM') {
             targetValue = toMeters(document.getElementById('distGoal').value);
-            if (document.getElementById('limit-DISTANCE').classList.contains('open')) {
+            if (document.getElementById('limit-KM').classList.contains('open')) {
                 const lm = toMeters(document.getElementById('distLimit').value);
                 if (lm > 0) dailyLimit = lm;
             }
@@ -401,17 +404,30 @@
         tbody.insertBefore(tr, tbody.firstChild);
     }
 
-    function typeLabel(t) { return { CHECK:'체크형', COUNT:'누적형', TIME:'시간', DISTANCE:'km' }[t] || t; }
+    function typeLabel(t) { return { CHECK:'체크형', COUNT:'누적형', TIME:'시간', KM:'km' }[t] || t; }
     function formatGoal(type, value) {
         if (type === 'CHECK' || type === 'COUNT') return value + '회';
         if (type === 'TIME') { const h = Math.floor(value/60), m = value%60; return (h>0?h+'시간 ':'')+m+'분'; }
-        if (type === 'DISTANCE') return (value/1000).toFixed(2)+'km';
+        if (type === 'KM') return (value/1000).toFixed(2)+'km';
         return value;
     }
     function convertToDays(str) {
+        // 1. 공백을 제거하고 오름차순으로 정렬한 뒤 하나의 문자열로 합칩니다. (예: " 5, 1,2 " -> "125")
+        const normalizedStr = str.split(',')
+            .map(n => n.trim())
+            .sort()
+            .join('');
+
+        // 2. 조건에 따른 특별한 문자열 리턴
+        if (normalizedStr === '1234567') return '매일';
+        if (normalizedStr === '12345') return '평일';
+        if (normalizedStr === '67') return '주말';
+
+        // 3. 위 조건에 해당하지 않는 경우 기존처럼 개별 요일로 매핑
         const map = {'1':'월','2':'화','3':'수','4':'목','5':'금','6':'토','7':'일'};
-        const days = str.split(',').map(n => map[n.trim()]||n.trim());
-        return days.length === 7 ? '매일' : days.join(', ');
+        const days = str.split(',').map(n => map[n.trim()] || n.trim());
+
+        return days.join(', ');
     }
 
     // ─── ISO 주차 유틸 ───────────────────────────

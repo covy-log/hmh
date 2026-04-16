@@ -15,7 +15,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -107,7 +110,40 @@ public class ViewController {
         Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
         List<Routine> routineList = routineService.findAllByMemberSeqNo(memberSeqNo);
 
+        for (Routine routine : routineList) {
+            String convertedDays = convertToDays(routine.getDaysOfWeek());
+            routine.setDaysOfWeek(convertedDays);
+        }
+
         model.addAttribute("routineList", routineList);
         return "routineSetting";
+    }
+
+    private String convertToDays(String daysOfWeek) {
+        if (daysOfWeek == null || daysOfWeek.trim().isEmpty()) {
+            return "";
+        }
+
+        // 1. 공백 제거 및 정렬하여 하나의 문자열로 합치기 (예: " 5, 1,2 " -> "125")
+        String normalizedStr = Arrays.stream(daysOfWeek.split(","))
+                .map(String::trim)
+                .sorted()
+                .collect(Collectors.joining());
+
+        // 2. 조건에 따른 특별한 문자열 리턴
+        if ("1234567".equals(normalizedStr)) return "매일";
+        if ("12345".equals(normalizedStr)) return "평일";
+        if ("67".equals(normalizedStr)) return "주말";
+
+        // 3. 위 조건에 해당하지 않는 경우 개별 요일로 매핑
+        Map<String, String> dayMap = Map.of(
+                "1", "월", "2", "화", "3", "수", "4", "목",
+                "5", "금", "6", "토", "7", "일"
+        );
+
+        return Arrays.stream(daysOfWeek.split(","))
+                .map(String::trim)
+                .map(n -> dayMap.getOrDefault(n, n))
+                .collect(Collectors.joining(", "));
     }
 }
