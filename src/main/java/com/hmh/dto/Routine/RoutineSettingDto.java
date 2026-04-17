@@ -23,14 +23,24 @@ public class RoutineSettingDto {
     private String title;
 
     /**
-     * 루틴 목표 수치 (예: 20시간, 4회)
+     * 루틴 목표 수치 (예: 20시간 => 1200, 5km => 5000)
      */
     private BigDecimal targetValue;
 
     /**
-     * 일일 한도 수치 (예: 20시간, 4회)
+     * 루틴 목표 수치 view (예: 1200 => 20시간, 5000 => 5km)
+     */
+    private String targetValueView;
+
+    /**
+     * 일일 한도 수치 (예: 20시간 => 1200, 5km => 5000)
      */
     private BigDecimal dailyLimit;
+
+    /**
+     * 일일 한도 수치 (예: 1200 => 20시간, 5000 => 5km)
+     */
+    private String dailyLimitView;
 
     /**
      * 루틴 타입 (예: CHECK, COUNT, TIME)
@@ -47,6 +57,11 @@ public class RoutineSettingDto {
      * 1:월요일, 2:화요일 ... 7:일요일
      */
     private String daysOfWeek;
+
+    /**
+     * 수행 요일 view (예: 매일, 주말, 평일, 월,수,금)
+     */
+    private String daysOfWeekView;
 
     /**
      * 루틴 시작(기준) 일자 (주기 계산을 위한 기준점)

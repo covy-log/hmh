@@ -131,7 +131,7 @@
                 </div>
 
                 <!-- km -->
-                <div id="goal-km" class="goal-block">
+                <div id="goal-KM" class="goal-block">
                     <div class="goal-main">
                         <input type="number" id="distGoal" min="0.01" step="0.01" value="5.00" style="width:90px;">
                         <span class="unit">km / 주</span>
@@ -182,7 +182,7 @@
             </thead>
             <tbody id="routineListBody">
 
-            <tr th:if="${#lists.isEmpty(routineList)}" id="emptyMessageRow">
+            <tr th:if="${#lists.isEmpty(routineSettingDtoList)}" id="emptyMessageRow">
                 <td colspan="6">
                     <div class="empty-state">
                         <span class="empty-icon">📋</span>
@@ -191,13 +191,13 @@
                 </td>
             </tr>
 
-            <tr th:unless="${#lists.isEmpty(routineList)}" th:each="routine : ${routineList}">
-                <td th:text="${routine.title}"></td>
-                <td><span class="type-badge" th:text="${routine.routineType}"></span></td>
-                <td th:text="${routine.targetValue}"></td>
-                <td th:text="${routine.dailyLimit != null ? routine.dailyLimit : '-'}"></td>
-                <td class="col-hide-sm" th:text="${routine.daysOfWeek}"></td>
-                <td class="col-hide-sm start-week" th:text="${routine.startYmd}"></td>
+            <tr th:unless="${#lists.isEmpty(routineSettingDtoList)}" th:each="routineSettingDto : ${routineSettingDtoList}">
+                <td th:text="${routineSettingDto.title}"></td>
+                <td><span class="type-badge" th:text="${routineSettingDto.routineType}"></span></td>
+                <td th:text="${routineSettingDto.targetValueView}"></td>
+                <td th:text="${routineSettingDto.dailyLimitView}"></td>
+                <td class="col-hide-sm" th:text="${routineSettingDto.daysOfWeekView}"></td>
+                <td class="col-hide-sm start-week" th:text="${routineSettingDto.startYmd}"></td>
             </tr>
 
             </tbody>

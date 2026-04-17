@@ -1,9 +1,11 @@
 package com.hmh.controller.view;
 
 import com.hmh.common.Const;
+import com.hmh.common.util.ViewUtil.*;
 import com.hmh.domain.DailyLog;
 import com.hmh.domain.Routine;
 import com.hmh.dto.Routine.DailyLogDto;
+import com.hmh.dto.Routine.RoutineSettingDto;
 import com.hmh.service.DailyLogService;
 import com.hmh.service.RoutineCycleService;
 import com.hmh.service.RoutineService;
@@ -15,10 +17,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import static com.hmh.common.util.ViewUtil.convertViewMetersToKmStr;
+import static com.hmh.common.util.ViewUtil.convertViewMmToHmStr;
+import static com.hmh.common.util.ViewUtil.convertViewToDays;
 
 @Controller
 @RequiredArgsConstructor
@@ -110,40 +114,49 @@ public class ViewController {
         Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
         List<Routine> routineList = routineService.findAllByMemberSeqNo(memberSeqNo);
 
+        List<RoutineSettingDto> routineSettingDtoList = new ArrayList<>();
+
         for (Routine routine : routineList) {
-            String convertedDays = convertToDays(routine.getDaysOfWeek());
-            routine.setDaysOfWeek(convertedDays);
+            String daysOfWeekView = convertViewToDays(routine.getDaysOfWeek());
+            String targetValueView;
+            String dailyLimitView;
+
+            int targetValueCnt = routine.getTargetValue().intValue();
+            int dailyLimitCnt = routine.getDailyLimit().intValue();
+
+            if ("CHECK".equals(routine.getRoutineType().name()) || "COUNT".equals(routine.getRoutineType().name())) {
+
+                targetValueView = targetValueCnt + Const.UNIT_COUNT;
+                dailyLimitView = dailyLimitCnt > 0 ? dailyLimitCnt + Const.UNIT_COUNT : Const.UNIT_NULL;
+
+            } else if ("TIME".equals(routine.getRoutineType().name())) {
+
+                targetValueView = convertViewMmToHmStr(targetValueCnt);
+                dailyLimitView = dailyLimitCnt > 0 ? convertViewMmToHmStr(dailyLimitCnt) : Const.UNIT_NULL;
+
+            } else if ("KM".equals(routine.getRoutineType().name())) {
+
+                targetValueView = convertViewMetersToKmStr(routine.getTargetValue().intValue());
+                dailyLimitView = dailyLimitCnt > 0 ? convertViewMetersToKmStr(dailyLimitCnt) : Const.UNIT_NULL;
+
+            } else {
+                targetValueView = Const.UNIT_NULL;
+                dailyLimitView = Const.UNIT_NULL;
+            }
+
+            RoutineSettingDto routineSettingDto = RoutineSettingDto.builder()
+                    .title(routine.getTitle())
+                    .routineType(routine.getRoutineType())
+                    .targetValueView(targetValueView)
+                    .dailyLimitView(dailyLimitView)
+                    .daysOfWeekView(daysOfWeekView)
+                    .startYmd(routine.getStartYmd())
+                    .build();
+
+            routineSettingDtoList.add(routineSettingDto);
         }
 
-        model.addAttribute("routineList", routineList);
+        model.addAttribute("routineSettingDtoList", routineSettingDtoList);
         return "routineSetting";
-    }
-
-    private String convertToDays(String daysOfWeek) {
-        if (daysOfWeek == null || daysOfWeek.trim().isEmpty()) {
-            return "";
-        }
-
-        // 1. 공백 제거 및 정렬하여 하나의 문자열로 합치기 (예: " 5, 1,2 " -> "125")
-        String normalizedStr = Arrays.stream(daysOfWeek.split(","))
-                .map(String::trim)
-                .sorted()
-                .collect(Collectors.joining());
-
-        // 2. 조건에 따른 특별한 문자열 리턴
-        if ("1234567".equals(normalizedStr)) return "매일";
-        if ("12345".equals(normalizedStr)) return "평일";
-        if ("67".equals(normalizedStr)) return "주말";
-
-        // 3. 위 조건에 해당하지 않는 경우 개별 요일로 매핑
-        Map<String, String> dayMap = Map.of(
-                "1", "월", "2", "화", "3", "수", "4", "목",
-                "5", "금", "6", "토", "7", "일"
-        );
-
-        return Arrays.stream(daysOfWeek.split(","))
-                .map(String::trim)
-                .map(n -> dayMap.getOrDefault(n, n))
-                .collect(Collectors.joining(", "));
     }
 }
