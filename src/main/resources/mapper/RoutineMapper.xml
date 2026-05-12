@@ -16,5 +16,6 @@
         FROM routine
         WHERE member_seq_no = #{memberSeqNo}
         AND status = 'IN_PROGRESS'
+        ORDER BY create_at desc
     </select>
 </mapper>

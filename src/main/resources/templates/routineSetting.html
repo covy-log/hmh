@@ -407,7 +407,15 @@
     function typeLabel(t) { return { CHECK:'체크형', COUNT:'누적형', TIME:'시간', KM:'km' }[t] || t; }
     function formatGoal(type, value) {
         if (type === 'CHECK' || type === 'COUNT') return value + '회';
-        if (type === 'TIME') { const h = Math.floor(value/60), m = value%60; return (h>0?h+'시간 ':'')+m+'분'; }
+        if (type === 'TIME') {
+            const h = Math.floor(value/60);
+            const m = value % 60;
+            if (m === 0) {
+                return (h>0?h+'시간 ':'');
+            } else {
+                return (h>0?h+'시간 ':'')+m+'분';
+            }
+        }
         if (type === 'KM') return (value/1000).toFixed(2)+'km';
         return value;
     }
