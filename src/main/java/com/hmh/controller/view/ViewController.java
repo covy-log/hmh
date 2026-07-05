@@ -1,10 +1,12 @@
 package com.hmh.controller.view;
 
 import com.hmh.common.Const;
-import com.hmh.common.util.ViewUtil.*;
 import com.hmh.domain.DailyLog;
 import com.hmh.domain.Routine;
+import com.hmh.domain.constant.LogStatus;
 import com.hmh.dto.Routine.DailyLogDto;
+import com.hmh.dto.Routine.DailyLogHistoryDto;
+import com.hmh.dto.Routine.RoutineCycleStatusDto;
 import com.hmh.dto.Routine.RoutineSettingDto;
 import com.hmh.service.DailyLogService;
 import com.hmh.service.RoutineCycleService;
@@ -20,8 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.hmh.common.util.ViewUtil.convertViewMetersToKmStr;
-import static com.hmh.common.util.ViewUtil.convertViewMmToHmStr;
+import static com.hmh.common.util.ViewUtil.convertValueView;
 import static com.hmh.common.util.ViewUtil.convertViewToDays;
 
 @Controller
@@ -98,9 +99,30 @@ public class ViewController {
     public String routineCycleStatusPage(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession();
         Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
-        List<Routine> routineList = routineService.findAllByMemberSeqNo(memberSeqNo);
 
-        model.addAttribute("routineList", routineList);
+        List<RoutineCycleStatusDto> routineCycleStatusDtoList = routineCycleService.findCurrentStatusByMemberSeqNo(memberSeqNo);
+
+        for (RoutineCycleStatusDto status : routineCycleStatusDtoList) {
+            int targetValueCnt = status.getTargetValue().intValue();
+            int currentValueCnt = status.getCurrentAchievedValue().intValue();
+
+            status.setTargetValueView(convertValueView(status.getRoutineType(), targetValueCnt));
+            status.setCurrentValueView(convertValueView(status.getRoutineType(), currentValueCnt));
+            status.setProgressPercent(targetValueCnt > 0
+                    ? Math.min(100, (int) Math.round(currentValueCnt * 100.0 / targetValueCnt))
+                    : 0);
+        }
+
+        List<DailyLogHistoryDto> dailyLogHistoryDtoList = dailyLogService.findHistoryByMemberSeqNo(memberSeqNo);
+
+        for (DailyLogHistoryDto history : dailyLogHistoryDtoList) {
+            history.setResultValueView(convertValueView(history.getRoutineType(), history.getAchievedValue().intValue()));
+            history.setTargetValueView(convertValueView(history.getRoutineType(), history.getTargetValue().intValue()));
+            history.setSuccess(LogStatus.DONE.equals(history.getStatus()));
+        }
+
+        model.addAttribute("routineCycleStatusDtoList", routineCycleStatusDtoList);
+        model.addAttribute("dailyLogHistoryDtoList", dailyLogHistoryDtoList);
         return "routineCycleStatus";
     }
 
@@ -118,31 +140,12 @@ public class ViewController {
 
         for (Routine routine : routineList) {
             String daysOfWeekView = convertViewToDays(routine.getDaysOfWeek());
-            String targetValueView;
-            String dailyLimitView;
 
             int targetValueCnt = routine.getTargetValue().intValue();
             int dailyLimitCnt = routine.getDailyLimit().intValue();
 
-            if ("CHECK".equals(routine.getRoutineType().name()) || "COUNT".equals(routine.getRoutineType().name())) {
-
-                targetValueView = targetValueCnt + Const.UNIT_COUNT;
-                dailyLimitView = dailyLimitCnt > 0 ? dailyLimitCnt + Const.UNIT_COUNT : Const.UNIT_NULL;
-
-            } else if ("TIME".equals(routine.getRoutineType().name())) {
-
-                targetValueView = convertViewMmToHmStr(targetValueCnt);
-                dailyLimitView = dailyLimitCnt > 0 ? convertViewMmToHmStr(dailyLimitCnt) : Const.UNIT_NULL;
-
-            } else if ("KM".equals(routine.getRoutineType().name())) {
-
-                targetValueView = convertViewMetersToKmStr(routine.getTargetValue().intValue());
-                dailyLimitView = dailyLimitCnt > 0 ? convertViewMetersToKmStr(dailyLimitCnt) : Const.UNIT_NULL;
-
-            } else {
-                targetValueView = Const.UNIT_NULL;
-                dailyLimitView = Const.UNIT_NULL;
-            }
+            String targetValueView = convertValueView(routine.getRoutineType(), targetValueCnt);
+            String dailyLimitView = dailyLimitCnt > 0 ? convertValueView(routine.getRoutineType(), dailyLimitCnt) : Const.UNIT_NULL;
 
             RoutineSettingDto routineSettingDto = RoutineSettingDto.builder()
                     .title(routine.getTitle())

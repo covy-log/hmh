@@ -1,6 +1,7 @@
 package com.hmh.repository;
 
 import com.hmh.domain.RoutineCycle;
+import com.hmh.dto.Routine.RoutineCycleStatusDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -15,6 +16,13 @@ public interface RoutineCycleMapper {
      * @return
      */
     void save(RoutineCycle cycle);
+
+    /**
+     * 특정 사용자의 진행 중인 루틴 사이클 달성 현황 조회
+     * @param memberSeqNo
+     * @return
+     */
+    List<RoutineCycleStatusDto> findCurrentStatusByMemberSeqNo(Long memberSeqNo);
 
     /**
      * 루틴 사이클 조회

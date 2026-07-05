@@ -13,11 +13,23 @@
     <update id="update" parameterType="RoutineCycle">
         UPDATE routine_cycle
         SET target_value = #{targetValue},
-            daily_limit = #{dailyLimit}
+            daily_limit = #{dailyLimit},
             current_achieved_value = #{currentAchievedValue}
         WHERE
             seq_no = #{seqNo}
     </update>
 
+    <select id="findCurrentStatusByMemberSeqNo" parameterType="long" resultType="RoutineCycleStatusDto">
+        SELECT
+            r.title,
+            r.routine_type,
+            rc.target_value,
+            rc.current_achieved_value
+        FROM routine_cycle rc
+        INNER JOIN routine r ON rc.routine_seq_no = r.seq_no
+        WHERE rc.member_seq_no = #{memberSeqNo}
+        AND rc.status = 'IN_PROGRESS'
+        ORDER BY r.create_at DESC
+    </select>
 
 </mapper>

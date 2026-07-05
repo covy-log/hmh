@@ -1,12 +1,29 @@
 package com.hmh.common.util;
 
 import com.hmh.common.Const;
+import com.hmh.domain.constant.RoutineType;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ViewUtil {
+
+    /**
+     * 루틴 타입에 맞춰 수치를 view용 문자열로 변환 (예: TIME=90 -> "1시간 30분", KM=5000 -> "5.00km")
+     */
+    public static String convertValueView(RoutineType routineType, int value) {
+        switch (routineType) {
+            case TIME:
+                return convertViewMmToHmStr(value);
+            case KM:
+                return convertViewMetersToKmStr(value);
+            case CHECK:
+            case COUNT:
+            default:
+                return value + Const.UNIT_COUNT;
+        }
+    }
 
     public static String convertViewToDays(String daysOfWeek) {
         if (daysOfWeek == null || daysOfWeek.trim().isEmpty()) {

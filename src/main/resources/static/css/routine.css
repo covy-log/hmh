@@ -561,7 +561,8 @@ input[type="week"]::-webkit-calendar-picker-indicator {
     font-size: 12px;
     font-weight: 600;
 }
-.status-badge.done {
+.status-badge.done,
+.status-badge.success {
     background: var(--success-light);
     color: var(--success);
 }
@@ -570,6 +571,40 @@ input[type="week"]::-webkit-calendar-picker-indicator {
     color: var(--text-hint);
     border: 1px solid var(--border);
 }
+.status-badge.fail {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+/* ══════════════════════════════════════════════
+   Progress Bar (routineCycleStatus)
+══════════════════════════════════════════════ */
+.progress-cell { min-width: 160px; }
+.progress-wrapper { display: flex; align-items: center; gap: 10px; }
+.progress-track {
+    flex: 1;
+    height: 8px;
+    background: var(--surface-sub);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+.progress-fill.complete { background: var(--success); }
+.progress-percent {
+    min-width: 38px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-family: var(--font-label);
+}
+.value-compare { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
 
 /* ── Empty State ── */
 .empty-state {

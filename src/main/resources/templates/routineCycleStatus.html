@@ -2,120 +2,151 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>대시보드 - 루틴 현황 및 히스토리</title>
-    <style>
-        /* 통일된 테이블 스타일 */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th, td { border: 1px solid #ccc; padding: 12px; text-align: left; vertical-align: middle; }
-        th { background-color: #f4f4f4; }
-
-        button { padding: 8px 15px; margin-right: 5px; cursor: pointer; }
-        .text-center { text-align: center; }
-
-        /* 진행률 바 스타일 */
-        .progress-container {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 8px;
-            height: 16px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: #4CAF50;
-            transition: width 0.3s ease;
-        }
-        .progress-wrapper { display: flex; align-items: center; gap: 10px; }
-        .progress-text { min-width: 40px; font-weight: bold; font-size: 0.9em; }
-
-        /* 히스토리 전용 스타일 */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-        .status-success { background-color: #e8f5e9; color: #2e7d32; } /* 성공: 연초록 */
-        .status-fail { background-color: #ffebee; color: #c62828; }    /* 미달: 연분홍 */
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>루틴 현황</title>
+    <link rel="stylesheet" th:href="@{/css/routine.css}" href="/css/routine.css">
 </head>
 <body>
 
-<div>
-    <button type="button" onclick="location.href='/dailyLog'">일일 루틴</button>
-    <button type="button" style="font-weight: bold;">루틴 현황</button>
-    <button type="button" onclick="location.href='/routineSetting'">루틴 설정</button>
-</div>
+<div class="page-wrapper">
 
-<hr>
+    <!-- ── Top Navigation ── -->
+    <nav class="top-nav">
+        <div class="nav-tabs">
+            <button type="button" class="nav-btn" onclick="location.href='/dailyLog'">일일 루틴</button>
+            <button type="button" class="nav-btn active">루틴 현황</button>
+            <button type="button" class="nav-btn" onclick="location.href='/routineSetting'">루틴 설정</button>
+        </div>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="테마 전환">🌙</button>
+    </nav>
 
-<h2>이번 주기 달성 현황</h2>
-<table>
-    <thead>
-    <tr>
-        <th>루틴명</th>
-        <th class="text-center" style="width: 120px;">현재 / 루틴</th>
-        <th>진행률</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:if="${#lists.isEmpty(routines)}">
-        <td colspan="3" class="text-center" style="padding: 20px;">진행 중인 루틴이 없어.</td>
-    </tr>
-    <tr th:unless="${#lists.isEmpty(routines)}" th:each="routine : ${routines}">
-        <td th:text="${routine.title}" style="font-weight: bold;">루틴 이름</td>
-        <td class="text-center">
-            <span th:text="${routine.currentValue != null ? routine.currentValue : 0}">0</span>
-            <span th:text="' / ' + ${routine.targetValue}"> / 10</span>
-        </td>
-        <td>
-            <div class="progress-wrapper">
-                <div class="progress-container">
-                    <div class="progress-bar" th:style="'width: ' + ${routine.progressPercent} + '%;'"></div>
-                </div>
-                <span class="progress-text" th:text="${routine.progressPercent} + '%'">0%</span>
-            </div>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <!-- ── Current Cycle Progress ── -->
+    <h2 class="section-title">이번 주기 달성 현황</h2>
 
-<br>
+    <div class="list-card">
+        <table class="routine-table">
+            <thead>
+            <tr>
+                <th>루틴명</th>
+                <th class="progress-cell">진행률</th>
+                <th>현재 / 목표</th>
+            </tr>
+            </thead>
+            <tbody>
 
-<h2>루틴 수행 히스토리</h2>
-<table>
-    <thead>
-    <tr>
-        <th class="text-center" style="width: 120px;">날짜</th>
-        <th>루틴명</th>
-        <th class="text-center">수행 결과</th>
-        <th class="text-center" style="width: 100px;">상태</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:if="${#lists.isEmpty(historyList)}">
-        <td colspan="4" class="text-center" style="padding: 30px; color: #888;">
-            아직 기록된 히스토리가 없어. 루틴을 완료해서 기록을 쌓아보자!
-        </td>
-    </tr>
+            <tr th:if="${#lists.isEmpty(routineCycleStatusDtoList)}">
+                <td colspan="3">
+                    <div class="empty-state">
+                        <span class="empty-icon">📈</span>
+                        진행 중인 루틴이 없어요.<br>
+                        <b>'루틴 설정'</b> 탭에서 새로운 루틴을 등록해 보세요.
+                    </div>
+                </td>
+            </tr>
 
-    <tr th:unless="${#lists.isEmpty(historyList)}" th:each="history : ${historyList}">
-        <td class="text-center" th:text="${history.date}">2026-04-03</td>
+            <tr th:unless="${#lists.isEmpty(routineCycleStatusDtoList)}" th:each="status : ${routineCycleStatusDtoList}">
+                <td>
+                    <span class="routine-name" th:text="${status.title}">루틴 이름</span>
+                </td>
+                <td class="progress-cell">
+                    <div class="progress-wrapper">
+                        <div class="progress-track">
+                            <div class="progress-fill"
+                                 th:classappend="${status.progressPercent >= 100} ? 'complete' : ''"
+                                 th:style="'width: ' + ${status.progressPercent} + '%;'"></div>
+                        </div>
+                        <span class="progress-percent" th:text="${status.progressPercent} + '%'">0%</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="value-compare">
+                        <span th:text="${status.currentValueView}">0</span> / <span th:text="${status.targetValueView}">0</span>
+                    </span>
+                </td>
+            </tr>
 
-        <td th:text="${history.routineName}">아침 조깅 5km</td>
+            </tbody>
+        </table>
+    </div>
 
-        <td class="text-center">
-            <span th:text="${history.resultValue}">5km</span>
-            <span th:if="${history.targetValue != null}" th:text="' / ' + ${history.targetValue}"> / 5km</span>
-        </td>
+    <!-- ── History ── -->
+    <h2 class="section-title">루틴 수행 히스토리</h2>
 
-        <td class="text-center">
-            <span th:if="${history.isSuccess}" class="status-badge status-success">성공</span>
-            <span th:unless="${history.isSuccess}" class="status-badge status-fail">미달</span>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <div class="list-card">
+        <table class="routine-table">
+            <thead>
+            <tr>
+                <th>날짜</th>
+                <th>루틴명</th>
+                <th>수행 결과</th>
+                <th class="check-cell">상태</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:if="${#lists.isEmpty(dailyLogHistoryDtoList)}">
+                <td colspan="4">
+                    <div class="empty-state">
+                        <span class="empty-icon">🗒️</span>
+                        아직 기록된 히스토리가 없어요.<br>
+                        루틴을 완료해서 기록을 쌓아보세요!
+                    </div>
+                </td>
+            </tr>
+
+            <tr th:unless="${#lists.isEmpty(dailyLogHistoryDtoList)}" th:each="history : ${dailyLogHistoryDtoList}">
+                <td class="start-week" th:text="${history.todoYmd}">2026-04-03</td>
+
+                <td>
+                    <span class="routine-name" th:text="${history.title}">아침 조깅</span>
+                </td>
+
+                <td>
+                    <span th:text="${history.resultValueView}">5km</span>
+                    <span class="value-unit">/ <span th:text="${history.targetValueView}">5km</span></span>
+                </td>
+
+                <td class="check-cell">
+                    <span th:if="${history.success}" class="status-badge success">성공</span>
+                    <span th:unless="${history.success}" class="status-badge fail">미달</span>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div><!-- /.page-wrapper -->
+
+<script>
+    // ─── 테마 토글 ───────────────────────────────
+    (function initTheme() {
+        const saved = localStorage.getItem('theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+        updateThemeIcon();
+    })();
+
+    function toggleTheme() {
+        const html    = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const next    = (current === 'dark' || (!current && sysDark)) ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+        const btn     = document.getElementById('themeToggle');
+        if (!btn) return;
+        const html    = document.documentElement;
+        const current = html.getAttribute('data-theme');
+        const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark  = current === 'dark' || (!current && sysDark);
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title       = isDark ? '라이트 모드로 전환' : '다크 모드로 전환';
+    }
+</script>
 
 </body>
 </html>

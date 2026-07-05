@@ -2,6 +2,7 @@ package com.hmh.service;
 
 import com.hmh.domain.DailyLog;
 import com.hmh.dto.Routine.DailyLogDto;
+import com.hmh.dto.Routine.DailyLogHistoryDto;
 import com.hmh.repository.DailyLogMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,10 @@ public class DailyLogService {
     public void update(DailyLog dailyLog) {
 
         dailyLogMapper.update(dailyLog);
+    }
+
+    public List<DailyLogHistoryDto> findHistoryByMemberSeqNo(Long memberSeqNo) {
+        return dailyLogMapper.findHistoryByMemberSeqNo(memberSeqNo);
     }
 }
 

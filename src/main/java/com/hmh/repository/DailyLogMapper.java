@@ -2,6 +2,7 @@ package com.hmh.repository;
 
 import com.hmh.domain.DailyLog;
 import com.hmh.dto.Routine.DailyLogDto;
+import com.hmh.dto.Routine.DailyLogHistoryDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDate;
@@ -38,4 +39,11 @@ public interface DailyLogMapper {
      * @return
      */
     List<DailyLog> findAllByCycleSeqNo(Long cycleSeqNo);
+
+    /**
+     * 특정 사용자의 루틴 수행 히스토리 조회 (TODO 상태 제외)
+     * @param memberSeqNo
+     * @return
+     */
+    List<DailyLogHistoryDto> findHistoryByMemberSeqNo(Long memberSeqNo);
 }

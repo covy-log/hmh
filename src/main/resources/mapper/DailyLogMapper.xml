@@ -39,4 +39,20 @@
             </if>
         WHERE seq_no = #{seqNo}
     </update>
+
+    <select id="findHistoryByMemberSeqNo" parameterType="long" resultType="DailyLogHistoryDto">
+        SELECT
+            dl.todo_ymd,
+            r.title,
+            r.routine_type,
+            dl.status,
+            dl.achieved_value,
+            rc.target_value
+        FROM daily_log dl
+        INNER JOIN routine_cycle rc ON dl.cycle_seq_no = rc.seq_no
+        INNER JOIN routine r ON rc.routine_seq_no = r.seq_no
+        WHERE dl.member_seq_no = #{memberSeqNo}
+        AND dl.status != 'TODO'
+        ORDER BY dl.todo_ymd DESC, dl.completed_at DESC
+    </select>
 </mapper>
