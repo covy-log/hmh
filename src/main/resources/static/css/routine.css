@@ -312,6 +312,7 @@ body {
    Inputs
 ══════════════════════════════════════════════ */
 input[type="text"],
+input[type="password"],
 input[type="number"],
 input[type="week"] {
     background: var(--surface-sub);
@@ -324,7 +325,7 @@ input[type="week"] {
     transition: border-color var(--transition), box-shadow var(--transition);
     outline: none;
 }
-input[type="text"]   { min-width: 200px; width: 100%; max-width: 300px; }
+input[type="text"],input[type="password"]   { min-width: 200px; width: 100%; max-width: 300px; }
 input[type="number"] { width: 76px; }
 input[type="week"]   { width: auto; }
 input.input-sm       { width: 60px; }
@@ -741,7 +742,7 @@ input[type="week"]::-webkit-calendar-picker-indicator {
     .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .stat-value { font-size: 26px; }
 
-    input[type="text"] { max-width: 100%; width: 100%; }
+    input[type="text"],input[type="password"] { max-width: 100%; width: 100%; }
 
     /* 리스트 테이블 — 작은 화면에서 일부 컬럼 숨김 */
     .routine-table .col-hide-sm { display: none; }
