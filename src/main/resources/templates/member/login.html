@@ -62,36 +62,87 @@
             font-family: var(--font-label);
         }
         
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--surface-sub);
-            color: var(--text-primary);
-            font-family: var(--font-body);
-            font-size: 15px;
-            transition: all var(--transition);
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
         }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: var(--surface);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+
+        .auth-form.shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: #e5484d;
+            box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.15);
         }
-        
-        .form-input::placeholder {
-            color: var(--text-hint);
-        }
-        
+
         .auth-footer {
             text-align: center;
             margin-top: 24px;
             padding-top: 24px;
             border-top: 1px solid var(--border-soft);
         }
-        
+
+        .btn-social {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 11px 16px;
+            margin-bottom: 12px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all var(--transition);
+        }
+
+        .btn-social svg,
+        .btn-social .social-badge {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .btn-google {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-google:hover {
+            background: var(--surface-sub);
+            border-color: var(--text-hint);
+        }
+
+        .btn-kakao,
+        .btn-naver {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-kakao:hover,
+        .btn-naver:hover {
+            background: var(--surface-sub);
+            border-color: var(--text-hint);
+        }
+
+        .social-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #03C75A;
+            color: #fff;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font-label);
+        }
+
         .auth-link {
             color: var(--accent);
             text-decoration: none;
@@ -121,19 +172,36 @@
             
             <div class="auth-form">
                 <div class="form-group">
-                    <label class="form-label" for="loginId">아이디</label>
                     <input type="text" id="loginId" class="form-input" placeholder="아이디를 입력하세요">
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="password">비밀번호</label>
                     <input type="password" id="password" class="form-input" placeholder="비밀번호를 입력하세요">
                 </div>
                 
-                <button class="btn-submit" onclick="login()" style="margin-top: 24px;">로그인</button>
+                <button class="btn-submit" onclick="login()" style="margin-top: 24px;">Login</button>
             </div>
             
             <div class="auth-footer">
+                <a href="/oauth2/authorization/google" class="btn-social btn-google">
+                    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+                        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l6.19 5.238C39.712 36.798 44 30.998 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+                    </svg>
+                    Google로 로그인
+                </a>
+                <a href="/oauth2/authorization/kakao" class="btn-social btn-kakao">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#FEE500" d="M10 1c-4.97 0-9 3.185-9 7.115 0 2.557 1.707 4.8 4.27 6.063-.188.703-.68 2.545-.78 2.94-.124.489.179.482.377.351.155-.103 2.472-1.68 3.47-2.36.209.03.42.045.663.045 4.97 0 9-3.186 9-7.04C18 4.185 14.97 1 10 1z"/>
+                    </svg>
+                    카카오로 로그인
+                </a>
+                <a href="/oauth2/authorization/naver" class="btn-social btn-naver">
+                    <span class="social-badge">N</span>
+                    네이버로 로그인
+                </a>
                 <span class="auth-text">아직 회원이 아니신가요? </span>
                 <a href="/signup" class="auth-link">회원가입 하러가기</a>
             </div>
@@ -160,14 +228,26 @@
 
             // 3. 결과 처리
             if (response.ok) { // HTTP 상태 코드가 200~299일 때
-                alert('로그인 성공!');
-                // 로그인 성공 후 메인 페이지로 이동 (나중에 main.html을 만들면 돼)
+
                 window.location.href = '/dailyLog';
             } else {
-                const errorMessage = await response.text();
-                alert('로그인 실패: ' + errorMessage);
+                showLoginError();
             }
         }
+
+        function showLoginError() {
+            const authForm = document.querySelector('.auth-form');
+            const inputs = authForm.querySelectorAll('.form-input');
+
+            authForm.classList.remove('shake');
+            void authForm.offsetWidth; // 애니메이션 재실행을 위한 강제 리플로우
+            authForm.classList.add('shake');
+            inputs.forEach(input => input.classList.add('input-error'));
+        }
+
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', () => input.classList.remove('input-error'));
+        });
     </script>
 </body>
 </html>

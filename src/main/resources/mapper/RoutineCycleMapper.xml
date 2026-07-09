@@ -19,6 +19,14 @@
             seq_no = #{seqNo}
     </update>
 
+    <select id="findLatestByRoutineSeqNo" parameterType="long" resultType="RoutineCycle">
+        SELECT *
+        FROM routine_cycle
+        WHERE routine_seq_no = #{routineSeqNo}
+        ORDER BY cycle_number DESC
+        LIMIT 1
+    </select>
+
     <select id="findCurrentStatusByMemberSeqNo" parameterType="long" resultType="RoutineCycleStatusDto">
         SELECT
             r.title,

@@ -1,12 +1,17 @@
 package com.hmh.config;
 
+import com.hmh.interceptor.AdminCheckInterceptor;
 import com.hmh.interceptor.LoginCheckInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
+    private final AdminCheckInterceptor adminCheckInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -19,5 +24,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/**", // API 통과
                         "/css/**", "/js/**", "/*.ico", "/error" // 정적 리소스 및 에러 페이지 통과
                 );
+
+        registry.addInterceptor(adminCheckInterceptor)
+                .order(2) // 로그인 체크 다음 순서
+                .addPathPatterns("/admin/**");
     }
 }

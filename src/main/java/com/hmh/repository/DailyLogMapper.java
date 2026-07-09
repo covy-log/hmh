@@ -26,6 +26,12 @@ public interface DailyLogMapper {
     void update(DailyLog dailyLog);
 
     /**
+     * 어제 미완료 기록 FAIL 처리
+     * @param dailyLog
+     */
+    void updateTodoToFail(DailyLog dailyLog);
+
+    /**
      * 특정 사용자의 오늘 해야 할 루틴 목록 조회
      * @param dailyLog
      * @return

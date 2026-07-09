@@ -4,11 +4,13 @@ import com.hmh.common.Const;
 import com.hmh.domain.DailyLog;
 import com.hmh.domain.Routine;
 import com.hmh.domain.constant.LogStatus;
+import com.hmh.domain.constant.MemberRole;
 import com.hmh.dto.Routine.DailyLogDto;
 import com.hmh.dto.Routine.DailyLogHistoryDto;
 import com.hmh.dto.Routine.RoutineCycleStatusDto;
 import com.hmh.dto.Routine.RoutineSettingDto;
 import com.hmh.service.DailyLogService;
+import com.hmh.service.MemberService;
 import com.hmh.service.RoutineCycleService;
 import com.hmh.service.RoutineService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +37,8 @@ public class ViewController {
 
     private final DailyLogService dailyLogService;
 
+    private final MemberService memberService;
+
     /**
      * 첫 페이지 접속 시 분기 처리
      */
@@ -52,6 +56,17 @@ public class ViewController {
     }
 
     /**
+     * 상단 네비게이션에 표시할 로그인 아이디, 관리자 여부를 모델에 담기
+     */
+    private void addLoginIdToModel(Long memberSeqNo, Model model) {
+        memberService.findBySeqNo(memberSeqNo)
+                .ifPresent(member -> {
+                    model.addAttribute("name", member.getName());
+                    model.addAttribute("isAdmin", member.getRole() == MemberRole.ADMIN);
+                });
+    }
+
+    /**
      * 일일 루틴 페이지 이동
      */
     @GetMapping("/dailyLog")
@@ -59,6 +74,7 @@ public class ViewController {
 
         HttpSession session = request.getSession();
         Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
+        addLoginIdToModel(memberSeqNo, model);
 
         DailyLog dailyLog = DailyLog.builder()
                 .memberSeqNo(memberSeqNo)
@@ -99,6 +115,7 @@ public class ViewController {
     public String routineCycleStatusPage(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession();
         Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
+        addLoginIdToModel(memberSeqNo, model);
 
         List<RoutineCycleStatusDto> routineCycleStatusDtoList = routineCycleService.findCurrentStatusByMemberSeqNo(memberSeqNo);
 
@@ -134,6 +151,7 @@ public class ViewController {
 
         HttpSession session = request.getSession();
         Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
+        addLoginIdToModel(memberSeqNo, model);
         List<Routine> routineList = routineService.findAllByMemberSeqNo(memberSeqNo);
 
         List<RoutineSettingDto> routineSettingDtoList = new ArrayList<>();

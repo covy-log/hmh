@@ -6,12 +6,16 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="seqNo" keyColumn="seq_no">
         INSERT INTO member
-            (login_id, password, name, email, week_start_day)
-        VALUES (#{loginId}, #{password}, #{name}, #{email}, #{weekStartDay})
+            (login_id, password, name, email, week_start_day, provider)
+        VALUES (#{loginId}, #{password}, #{name}, #{email}, #{weekStartDay}, #{provider})
     </insert>
 
     <select id="findById" resultType="Member">
         SELECT * FROM member WHERE login_id = #{loginId}
+    </select>
+
+    <select id="findBySeqNo" resultType="Member">
+        SELECT * FROM member WHERE seq_no = #{seqNo}
     </select>
 
     <select id="findAll" resultType="Member">

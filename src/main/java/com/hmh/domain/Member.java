@@ -1,5 +1,6 @@
 package com.hmh.domain;
 
+import com.hmh.domain.constant.MemberProvider;
 import com.hmh.domain.constant.MemberRole;
 import com.hmh.domain.constant.MemberStatus;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,12 @@ public class Member {
      * 주시작요일
      */
     private String weekStartDay;
+
+    /**
+     * 가입 경로 (LOCAL, GOOGLE, KAKAO, NAVER)
+     */
+    @Builder.Default
+    private MemberProvider provider = MemberProvider.LOCAL;
 
     /**
      * 회원 상태 (예: ACTIVE, DORMANCY(휴면), BANNED, DELETED)

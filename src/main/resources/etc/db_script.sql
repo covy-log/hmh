@@ -1,10 +1,11 @@
 CREATE TABLE member (
                         seq_no BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                         login_id VARCHAR(50) NOT NULL UNIQUE,
-                        password VARCHAR(255) NOT NULL,
+                        password VARCHAR(255),
                         name VARCHAR(50) NOT NULL,
                         email VARCHAR(100) NOT NULL UNIQUE,
                         week_start_day VARCHAR(10) NOT NULL,
+                        provider VARCHAR(20) NOT NULL DEFAULT 'LOCAL',
                         status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
                         role VARCHAR(20) NOT NULL DEFAULT 'BASIC_USER',
                         last_login_at TIMESTAMP,
@@ -15,10 +16,11 @@ CREATE TABLE member (
 COMMENT ON TABLE member IS '회원 정보 테이블';
 COMMENT ON COLUMN member.seq_no IS '회원 고유번호 (PK)';
 COMMENT ON COLUMN member.login_id IS '로그인 아이디';
-COMMENT ON COLUMN member.password IS '비밀번호 (암호화 됨)';
+COMMENT ON COLUMN member.password IS '비밀번호 (암호화 됨, 소셜 로그인 회원은 NULL)';
 COMMENT ON COLUMN member.name IS '사용자 닉네임 또는 이름';
 COMMENT ON COLUMN member.email IS '이메일 주소';
 COMMENT ON COLUMN member.week_start_day IS '주 시작 요일';
+COMMENT ON COLUMN member.provider IS '가입 경로 (LOCAL, GOOGLE, KAKAO, NAVER 등)';
 COMMENT ON COLUMN member.status IS '회원 상태 (ACTIVE, DORMANCY, BANNED, DELETED 등)';
 COMMENT ON COLUMN member.role IS '회원 권한 (BASIC_USER, ADMIN 등)';
 COMMENT ON COLUMN member.last_login_at IS '마지막 로그인 일시';
@@ -108,4 +110,26 @@ COMMENT ON COLUMN daily_log.achieved_value IS '오늘 하루 동안 달성한 �
 COMMENT ON COLUMN daily_log.completed_at IS '사용자가 실제로 완료 처리를 한 시간';
 COMMENT ON COLUMN daily_log.create_at IS '생성일시';
 COMMENT ON COLUMN daily_log.change_at IS '변경일시';
+
+
+CREATE TABLE daemon_log (
+                            seq_no BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                            daemon_name VARCHAR(100) NOT NULL,
+                            start_dt TIMESTAMP NOT NULL,
+                            end_dt TIMESTAMP,
+                            success_count INTEGER NOT NULL DEFAULT 0,
+                            fail_count INTEGER NOT NULL DEFAULT 0,
+                            status VARCHAR(20) NOT NULL DEFAULT 'RUNNING',
+                            err_msg TEXT
+);
+
+COMMENT ON TABLE daemon_log IS '데몬 배치 실행 이력 테이블';
+COMMENT ON COLUMN daemon_log.seq_no IS '데몬 실행 이력 고유번호 (PK)';
+COMMENT ON COLUMN daemon_log.daemon_name IS '실행된 데몬(배치) 이름';
+COMMENT ON COLUMN daemon_log.start_dt IS '배치 시작 일시';
+COMMENT ON COLUMN daemon_log.end_dt IS '배치 종료 일시';
+COMMENT ON COLUMN daemon_log.success_count IS '처리 성공 건수';
+COMMENT ON COLUMN daemon_log.fail_count IS '처리 실패 건수';
+COMMENT ON COLUMN daemon_log.status IS '배치 실행 상태 (RUNNING, SUCCESS, PARTIAL_FAIL, FAIL 등)';
+COMMENT ON COLUMN daemon_log.err_msg IS '실패 건별 에러 메시지 요약 (예: [routine_seq_no] 메시지 형태로 개행 이어붙임)';
 

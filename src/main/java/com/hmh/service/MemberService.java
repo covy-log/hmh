@@ -1,6 +1,7 @@
 package com.hmh.service;
 
 import com.hmh.domain.Member;
+import com.hmh.domain.constant.MemberProvider;
 import com.hmh.repository.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -71,10 +72,41 @@ public class MemberService {
     }
 
     /**
+     * 단일 회원 조회 (PK 기준)
+     */
+    public Optional<Member> findBySeqNo(Long seqNo) {
+        return memberMapper.findBySeqNo(seqNo);
+    }
+
+    /**
      * 회원 정보 수정
      */
     public void updateMember(Member member) {
         // 필요하다면 여기서 수정하려는 회원이 실제로 존재하는지 먼저 검증할 수도 있어
         memberMapper.update(member);
+    }
+
+    /**
+     * 소셜 로그인 회원 조회, 없으면 신규 가입 처리
+     * (loginId 기준으로 기존 회원을 찾고, 없으면 provider 기준으로 새로 생성)
+     * loginId는 provider별로 고유하게 만들어서 넘겨줘야 함 (예: 구글은 email, 카카오는 "kakao_" + 카카오id)
+     */
+    public Member findOrCreateByOAuth(String loginId, String name, String email, MemberProvider provider) {
+        Member member = memberMapper.findById(loginId)
+                .orElseGet(() -> {
+                    Member newMember = Member.builder()
+                            .loginId(loginId)
+                            .password(null)
+                            .name(name)
+                            .email(email)
+                            .weekStartDay("1")
+                            .provider(provider)
+                            .build();
+                    memberMapper.save(newMember);
+                    return newMember;
+                });
+
+        memberMapper.updateLastLoginAt(member); // 로그인 시간 최신화
+        return member;
     }
 }

@@ -18,4 +18,13 @@
         AND status = 'IN_PROGRESS'
         ORDER BY create_at desc
     </select>
+
+    <select id="findAllByInProgress" parameterType="Routine" resultType="Routine">
+        SELECT
+            *
+        FROM routine
+        WHERE status = 'IN_PROGRESS'
+        AND start_ymd <![CDATA[<=]]> #{startYmd}
+    </select>
+
 </mapper>

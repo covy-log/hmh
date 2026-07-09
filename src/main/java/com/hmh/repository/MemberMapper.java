@@ -24,6 +24,13 @@ public interface MemberMapper {
     Optional<Member> findById(String loginId);
 
     /**
+     * 회원 조회 (PK 기준)
+     * @param seqNo
+     * @return
+     */
+    Optional<Member> findBySeqNo(Long seqNo);
+
+    /**
      * 전체 회원 조회
      * @return
      */

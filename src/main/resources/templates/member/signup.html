@@ -62,29 +62,6 @@
             font-family: var(--font-label);
         }
         
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--surface-sub);
-            color: var(--text-primary);
-            font-family: var(--font-body);
-            font-size: 15px;
-            transition: all var(--transition);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: var(--surface);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-        
-        .form-input::placeholder {
-            color: var(--text-hint);
-        }
-        
         .radio-group {
             display: flex;
             gap: 16px;
@@ -201,6 +178,7 @@
                     <input type="email" id="email" class="form-input" placeholder="이메일 주소를 입력하세요">
                 </div>
                 
+                <!-- 주 시작 요일: 아직 비공개 기능이라 숨김 처리. 회원별 설정 기능 붙일 때 다시 노출 예정
                 <div class="form-group">
                     <label class="form-label">주 시작 요일</label>
                     <div class="radio-group">
@@ -214,7 +192,8 @@
                         </label>
                     </div>
                 </div>
-                
+                -->
+
                 <button class="btn-submit" onclick="signup()" style="margin-top: 24px;">가입하기</button>
             </div>
             
@@ -232,7 +211,7 @@
             const password = document.getElementById('password').value;
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value
-            const weekStartDay = document.querySelector('input[name="weekStartDay"]:checked').value;
+            const weekStartDay = "1"; // 주 시작 요일 선택 UI는 비공개 처리, 우선 월요일 고정
 
             // 2. 서버로 JSON 데이터 전송
             const response = await fetch('/api/members/join', {

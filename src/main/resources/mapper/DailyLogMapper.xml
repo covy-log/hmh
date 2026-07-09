@@ -40,6 +40,14 @@
         WHERE seq_no = #{seqNo}
     </update>
 
+    <update id="updateTodoToFail" parameterType="DailyLog">
+        UPDATE daily_log
+        SET status = 'FAIL',
+        change_at = NOW()
+        WHERE status = #{status}
+        AND todo_ymd <![CDATA[<]]> #{todoYmd}
+    </update>
+
     <select id="findHistoryByMemberSeqNo" parameterType="long" resultType="DailyLogHistoryDto">
         SELECT
             dl.todo_ymd,

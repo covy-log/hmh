@@ -23,6 +23,13 @@ public interface RoutineMapper {
     List<Routine> findAllByMemberSeqNo(Long memberSeqNo);
 
     /**
+     * 진행중인 모든 루틴 조회
+     * @param routine
+     * @return
+     */
+    List<Routine> findAllByInProgress(Routine routine);
+
+    /**
      * 루틴 변경(삭제포함)
      * @param routine
      */
