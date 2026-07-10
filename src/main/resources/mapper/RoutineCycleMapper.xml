@@ -14,10 +14,16 @@
         UPDATE routine_cycle
         SET target_value = #{targetValue},
             daily_limit = #{dailyLimit},
-            current_achieved_value = #{currentAchievedValue}
+            current_achieved_value = #{currentAchievedValue},
+            status = #{status},
+            change_at = NOW()
         WHERE
             seq_no = #{seqNo}
     </update>
+
+    <select id="findById" parameterType="long" resultType="RoutineCycle">
+        SELECT * FROM routine_cycle WHERE seq_no = #{seqNo}
+    </select>
 
     <select id="findLatestByRoutineSeqNo" parameterType="long" resultType="RoutineCycle">
         SELECT *

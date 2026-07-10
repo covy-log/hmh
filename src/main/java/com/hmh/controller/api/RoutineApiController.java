@@ -116,6 +116,11 @@ public class RoutineApiController {
 
             dailyLogService.update(dailyLog);
 
+            // 사이클 달성 수치 재계산 및 반영
+            DailyLog savedLog = dailyLogService.findById(dailyLogDto.getSeqNo())
+                    .orElseThrow(() -> new IllegalStateException("일일 기록을 찾을 수 없습니다."));
+            routineCycleService.recalculateAchievedValue(savedLog.getCycleSeqNo());
+
             // 성공 시 201 Created 상태 코드 반환
             return ResponseEntity.status(HttpStatus.CREATED).body("success");
 

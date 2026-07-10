@@ -5,6 +5,7 @@ import com.hmh.domain.DailyLog;
 import com.hmh.domain.Routine;
 import com.hmh.domain.constant.LogStatus;
 import com.hmh.domain.constant.MemberRole;
+import com.hmh.domain.constant.RoutineType;
 import com.hmh.dto.Routine.DailyLogDto;
 import com.hmh.dto.Routine.DailyLogHistoryDto;
 import com.hmh.dto.Routine.RoutineCycleStatusDto;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +92,19 @@ public class ViewController {
         for (DailyLogDto dailyLogDto : dailyLogDtoList) {
             if ("DONE".equals(dailyLogDto.getStatus().name())) { // NPE 방지를 위해 "DONE"을 앞으로 배치
                 completedCount++;
+            }
+
+            // achieved_value 컬럼이 NUMERIC(10,2)라 정수 타입도 "20.00"처럼 내려온다. 타입별로 표시 형식을 맞춘다.
+            if (dailyLogDto.getAchievedValue() != null) {
+                if (dailyLogDto.getRoutineType() == RoutineType.KM) {
+                    // km 타입은 DB에 미터(정수)로 저장돼 있어서, 입력창엔 km(소수 2자리)로 보여준다
+                    dailyLogDto.setAchievedValue(
+                            dailyLogDto.getAchievedValue().divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP)
+                    );
+                } else {
+                    // COUNT, TIME(분): 정수 표시
+                    dailyLogDto.setAchievedValue(dailyLogDto.getAchievedValue().setScale(0, RoundingMode.HALF_UP));
+                }
             }
         }
 

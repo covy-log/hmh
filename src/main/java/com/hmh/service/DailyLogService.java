@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,10 @@ public class DailyLogService {
     public void update(DailyLog dailyLog) {
 
         dailyLogMapper.update(dailyLog);
+    }
+
+    public Optional<DailyLog> findById(Long seqNo) {
+        return dailyLogMapper.findById(seqNo);
     }
 
     public List<DailyLogHistoryDto> findHistoryByMemberSeqNo(Long memberSeqNo) {

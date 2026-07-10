@@ -10,6 +10,10 @@
         VALUES (#{cycleSeqNo}, #{memberSeqNo}, #{todoYmd})
     </insert>
 
+    <select id="findById" parameterType="long" resultType="DailyLog">
+        SELECT * FROM daily_log WHERE seq_no = #{seqNo}
+    </select>
+
     <select id="findAllOfTodayByDailyLog" resultType="DailyLogDto" parameterType="DailyLog">
         SELECT
             dl.seq_no,
@@ -24,6 +28,10 @@
         INNER JOIN routine r ON rc.routine_seq_no = r.seq_no
         WHERE dl.member_seq_no = #{memberSeqNo}
         AND dl.todo_ymd = #{todoYmd}
+    </select>
+
+    <select id="findAllByCycleSeqNo" parameterType="long" resultType="DailyLog">
+        SELECT * FROM daily_log WHERE cycle_seq_no = #{cycleSeqNo}
     </select>
 
     <update id="update" parameterType="DailyLog">

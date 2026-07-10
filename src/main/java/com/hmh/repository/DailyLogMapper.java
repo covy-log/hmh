@@ -26,6 +26,13 @@ public interface DailyLogMapper {
     void update(DailyLog dailyLog);
 
     /**
+     * 일일 기록 단건 조회
+     * @param seqNo
+     * @return
+     */
+    Optional<DailyLog> findById(Long seqNo);
+
+    /**
      * 어제 미완료 기록 FAIL 처리
      * @param dailyLog
      */

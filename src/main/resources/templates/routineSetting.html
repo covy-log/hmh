@@ -170,8 +170,24 @@
         <div class="field-row">
             <span class="field-label">시작 주</span>
             <div class="field-content">
-                <input type="week" id="startYmd">
-                <span class="input-hint">* 기본값: 이번 주</span>
+                <div class="date-picker" id="startYmdPicker">
+                    <button type="button" class="date-picker-trigger" id="startYmdTrigger" onclick="toggleCalendar(event)">
+                        <span id="startYmdDisplay">-</span>
+                    </button>
+                    <input type="hidden" id="startYmd">
+                    <div class="calendar-popup" id="calendarPopup">
+                        <div class="calendar-header">
+                            <button type="button" class="calendar-nav" onclick="changeMonth(-1)">‹</button>
+                            <span class="calendar-month-label" id="calendarMonthLabel"></span>
+                            <button type="button" class="calendar-nav" onclick="changeMonth(1)">›</button>
+                        </div>
+                        <div class="calendar-weekdays">
+                            <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                    </div>
+                </div>
+                <span class="input-hint">* 시작일은 월요일만 선택할 수 있어요 (지난 날짜는 선택 불가)</span>
             </div>
         </div>
 
@@ -276,7 +292,7 @@
 
     // ─── 페이지 초기화 ───────────────────────────
     window.onload = function () {
-        document.getElementById('startYmd').value = getISOWeekString(new Date());
+        resetStartYmdToThisWeek();
         updateCheckMaxHint();
     };
 
@@ -368,7 +384,7 @@
     // ─── 요청 데이터 빌드 ────────────────────────
     function buildRequestData(type) {
         const daysStr  = getSelectedDaysStr();
-        const startYmd = getMondayFromWeekStr(document.getElementById('startYmd').value);
+        const startYmd = document.getElementById('startYmd').value;
         let targetValue = null, dailyLimit = 0;
         if (type === 'CHECK') {
             targetValue = parseInt(document.getElementById('checkGoal').value);
@@ -421,7 +437,7 @@
         onAnyDayChange();
         document.querySelector('input[name="routineType"][value="CHECK"]').checked = true;
         onTypeChange();
-        document.getElementById('startYmd').value = getISOWeekString(new Date());
+        resetStartYmdToThisWeek();
         clearErrors();
     }
 
@@ -476,23 +492,103 @@
         return days.join(', ');
     }
 
-    // ─── ISO 주차 유틸 ───────────────────────────
-    function getISOWeekString(date) {
-        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        const day = d.getUTCDay() || 7;
-        d.setUTCDate(d.getUTCDate() + 4 - day);
-        const y = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        const w = Math.ceil((((d - y) / 86400000) + 1) / 7);
-        return d.getUTCFullYear() + '-W' + String(w).padStart(2, '0');
+    // ─── 시작 주 달력 ─────────────────────────────
+    let selectedMonday = null;   // 현재 선택된 주의 월요일 (Date)
+    let calendarViewDate = null; // 달력이 보여주고 있는 월 (Date)
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function formatDate(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+    function getMonday(date) {
+        const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const day = d.getDay() || 7; // 일요일(0) -> 7
+        d.setDate(d.getDate() - day + 1);
+        return d;
     }
-    function getMondayFromWeekStr(weekStr) {
-        if (!weekStr) return null;
-        const year = parseInt(weekStr.substring(0, 4));
-        const week = parseInt(weekStr.substring(6, 8));
-        const jan4 = new Date(year, 0, 4);
-        const firstMonday = new Date(year, 0, 4 - (jan4.getDay()||7) + 1);
-        const target = new Date(firstMonday.getTime() + (week-1)*7*86400000);
-        return `${target.getFullYear()}-${String(target.getMonth()+1).padStart(2,'0')}-${String(target.getDate()).padStart(2,'0')}`;
+    function getSunday(date) {
+        const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        d.setDate(d.getDate() - d.getDay()); // 일요일(0) 기준 그리드 시작
+        return d;
+    }
+    function getToday() {
+        const t = new Date();
+        t.setHours(0, 0, 0, 0);
+        return t;
+    }
+
+    function resetStartYmdToThisWeek() {
+        selectedMonday = getMonday(new Date());
+        calendarViewDate = new Date(selectedMonday);
+        document.getElementById('startYmd').value = formatDate(selectedMonday);
+        updateStartYmdDisplay();
+    }
+
+    function updateStartYmdDisplay() {
+        document.getElementById('startYmdDisplay').textContent = formatDate(selectedMonday) + ' (월) 시작';
+    }
+
+    function toggleCalendar(event) {
+        event.stopPropagation();
+        const popup = document.getElementById('calendarPopup');
+        const willOpen = !popup.classList.contains('open');
+        popup.classList.toggle('open', willOpen);
+        if (willOpen) renderCalendar();
+    }
+
+    document.addEventListener('click', (event) => {
+        const picker = document.getElementById('startYmdPicker');
+        if (picker && !picker.contains(event.target)) {
+            document.getElementById('calendarPopup').classList.remove('open');
+        }
+    });
+
+    function changeMonth(delta) {
+        calendarViewDate.setMonth(calendarViewDate.getMonth() + delta);
+        renderCalendar();
+    }
+
+    function selectDay(date) {
+        selectedMonday = date; // 월요일 셀만 클릭 가능하므로 그대로 사용
+        calendarViewDate = new Date(selectedMonday);
+        document.getElementById('startYmd').value = formatDate(selectedMonday);
+        updateStartYmdDisplay();
+        document.getElementById('calendarPopup').classList.remove('open');
+    }
+
+    function renderCalendar() {
+        const y = calendarViewDate.getFullYear();
+        const m = calendarViewDate.getMonth();
+        document.getElementById('calendarMonthLabel').textContent = y + '년 ' + (m + 1) + '월';
+
+        const gridStart = getSunday(new Date(y, m, 1));
+        const today = getToday();
+        const currentWeekMonday = getMonday(today); // 이번 주 월요일은 이미 지났어도 선택 가능해야 함
+        const selectedMondayTime = selectedMonday.getTime();
+
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        for (let i = 0; i < 42; i++) {
+            const cellDate = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i);
+            const isMonday = cellDate.getDay() === 1;
+            const isPast = cellDate.getTime() < currentWeekMonday.getTime();
+            const isDisabled = !isMonday || isPast;
+
+            const cell = document.createElement('div');
+            cell.className = 'calendar-day';
+            cell.textContent = cellDate.getDate();
+
+            if (cellDate.getMonth() !== m) cell.classList.add('other-month');
+            if (cellDate.getTime() === today.getTime()) cell.classList.add('today');
+            if (cellDate.getTime() === selectedMondayTime) cell.classList.add('week-start');
+
+            if (isDisabled) {
+                cell.classList.add('disabled');
+            } else {
+                cell.addEventListener('click', () => selectDay(cellDate));
+            }
+
+            grid.appendChild(cell);
+        }
     }
 </script>
 

@@ -18,6 +18,12 @@ public interface RoutineCycleMapper {
     void save(RoutineCycle cycle);
 
     /**
+     * 루틴 사이클 정보 변경 (달성 수치, 마감 상태 등)
+     * @param cycle
+     */
+    void update(RoutineCycle cycle);
+
+    /**
      * 특정 사용자의 진행 중인 루틴 사이클 달성 현황 조회
      * @param memberSeqNo
      * @return
