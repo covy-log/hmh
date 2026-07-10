@@ -23,6 +23,8 @@
             <div class="profile-dropdown" id="profileDropdown">
                 <button type="button" class="dropdown-item" disabled>마이페이지</button>
                 <button type="button" class="dropdown-item" th:if="${isAdmin}" onclick="location.href='/admin'">관리 페이지</button>
+                <button type="button" class="dropdown-item" th:if="${isAdmin}" onclick="runDaemon('RoutineCycleDaemon', 'routine-cycle')">RoutineCycleDaemon 실행</button>
+                <button type="button" class="dropdown-item" th:if="${isAdmin}" onclick="runDaemon('DailyLogDaemon', 'daily-log')">DailyLogDaemon 실행</button>
                 <button type="button" class="dropdown-item" onclick="logout()">로그아웃</button>
             </div>
         </div>
@@ -201,6 +203,21 @@
     async function logout() {
         await fetch('/api/members/logout', { method: 'POST' });
         window.location.href = '/login';
+    }
+
+    // ─── 어드민: 데몬 수동 실행 ───────────────────
+    async function runDaemon(daemonName, path) {
+        if (!confirm(daemonName + '를 지금 수동으로 실행할까요?')) return;
+
+        try {
+            const response = await fetch('/admin/daemon/' + path, { method: 'POST' });
+            const message  = await response.text();
+            if (!response.ok) throw new Error(message);
+            alert(message);
+        } catch (error) {
+            console.error('Daemon run failed:', error);
+            alert(daemonName + ' 실행 중 오류가 발생했어요: ' + error.message);
+        }
     }
 
     // ─── 통계 초기값 ─────────────────────────────
