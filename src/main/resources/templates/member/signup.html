@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>회원가입</title>
     <link rel="stylesheet" href="/css/routine.css">
+    <script src="/js/dialog.js"></script>
     <style>
         /* 회원가입 페이지 전용 스타일 */
         .auth-container {
@@ -230,11 +231,11 @@
 
             // 3. 결과 처리
             if (response.status === 201) { // 컨트롤러에서 설정한 HttpStatus.CREATED
-                alert('회원가입이 완료되었습니다! 로그인 해주세요.');
+                await showAlert('회원가입이 완료되었습니다! 로그인 해주세요.');
                 window.location.href = 'login.html'; // 가입 성공 시 로그인 페이지로 강제 이동
             } else {
                 const errorMessage = await response.text();
-                alert('회원가입 실패: ' + errorMessage);
+                showAlert('회원가입 실패: ' + errorMessage);
             }
         }
     </script>

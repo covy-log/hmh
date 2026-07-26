@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>일일 루틴</title>
     <link rel="stylesheet" th:href="@{/css/routine.css}" href="/css/routine.css">
+    <script th:src="@{/js/dialog.js}" src="/js/dialog.js"></script>
 </head>
 <body>
 
@@ -207,16 +208,16 @@
 
     // ─── 어드민: 데몬 수동 실행 ───────────────────
     async function runDaemon(daemonName, path) {
-        if (!confirm(daemonName + '를 지금 수동으로 실행할까요?')) return;
+        if (!(await showConfirm(daemonName + '를 지금 수동으로 실행할까요?'))) return;
 
         try {
             const response = await fetch('/admin/daemon/' + path, { method: 'POST' });
             const message  = await response.text();
             if (!response.ok) throw new Error(message);
-            alert(message);
+            showAlert(message);
         } catch (error) {
             console.error('Daemon run failed:', error);
-            alert(daemonName + ' 실행 중 오류가 발생했어요: ' + error.message);
+            showAlert(daemonName + ' 실행 중 오류가 발생했어요: ' + error.message);
         }
     }
 
@@ -266,7 +267,7 @@
         const originalValue = inputEl ? inputEl.value : 0;
 
         if (isChecked && (!originalValue || parseFloat(originalValue) <= 0)) {
-            alert('오늘 달성한 수치를 입력해야 해요!');
+            showAlert('오늘 달성한 수치를 입력해야 해요!');
             checkbox.checked = false;
             return;
         }
@@ -295,7 +296,7 @@
 
         } catch (error) {
             console.error('Update failed:', error);
-            alert('서버와 통신하는 데 문제가 발생했어요. 되돌릴게요!');
+            showAlert('서버와 통신하는 데 문제가 발생했어요. 되돌릴게요!');
 
             // 롤백
             checkbox.checked = !isChecked;

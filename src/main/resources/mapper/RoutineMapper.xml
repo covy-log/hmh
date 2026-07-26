@@ -36,4 +36,14 @@
         AND status = 'IN_PROGRESS'
     </update>
 
+    <update id="updateSetting">
+        UPDATE routine
+        SET target_value = #{targetValue},
+            daily_limit = #{dailyLimit},
+            change_at = NOW()
+        WHERE seq_no = #{seqNo}
+        AND member_seq_no = #{memberSeqNo}
+        AND status = 'IN_PROGRESS'
+    </update>
+
 </mapper>

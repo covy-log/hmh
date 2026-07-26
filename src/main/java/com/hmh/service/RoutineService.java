@@ -1,6 +1,7 @@
 package com.hmh.service;
 
 import com.hmh.domain.Routine;
+import com.hmh.dto.Routine.RoutineUpdateDto;
 import com.hmh.repository.DailyLogMapper;
 import com.hmh.repository.RoutineCycleMapper;
 import com.hmh.repository.RoutineMapper;
@@ -53,5 +54,17 @@ public class RoutineService {
 
         // 3. 미수행(TODO) 일일 기록 취소
         dailyLogMapper.cancelByRoutineSeqNo(seqNo, memberSeqNo);
+    }
+
+    /**
+     * 루틴 설정 수정 (목표 수치, 1일 최대 한도)
+     * 이번 주 사이클은 이미 만들어진 스냅샷을 사용하므로 영향이 없고,
+     * 데몬이 다음 주 사이클을 생성할 때 새 값이 반영된다.
+     * @param seqNo 루틴 고유번호
+     * @param memberSeqNo 회원 고유번호 (본인 루틴만 수정되도록 제한)
+     * @param updateDto 수정할 목표 수치·1일 최대 한도
+     */
+    public void updateSetting(Long seqNo, Long memberSeqNo, RoutineUpdateDto updateDto) {
+        routineMapper.updateSetting(seqNo, memberSeqNo, updateDto.getTargetValue(), updateDto.getDailyLimit());
     }
 }

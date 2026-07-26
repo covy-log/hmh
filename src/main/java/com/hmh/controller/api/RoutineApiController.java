@@ -6,6 +6,7 @@ import com.hmh.domain.Routine;
 import com.hmh.domain.RoutineCycle;
 import com.hmh.dto.Routine.DailyLogDto;
 import com.hmh.dto.Routine.RoutineSettingDto;
+import com.hmh.dto.Routine.RoutineUpdateDto;
 import com.hmh.service.DailyLogService;
 import com.hmh.service.RoutineCycleService;
 import com.hmh.service.RoutineService;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,6 +111,19 @@ public class RoutineApiController {
         Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
 
         routineService.delete(seqNo, memberSeqNo);
+
+        return ResponseEntity.ok("success");
+    }
+
+    @PatchMapping("/{seqNo}")
+    public ResponseEntity<String> updateSetting(@PathVariable Long seqNo,
+                                                @RequestBody RoutineUpdateDto routineUpdateDto,
+                                                HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
+
+        routineService.updateSetting(seqNo, memberSeqNo, routineUpdateDto);
 
         return ResponseEntity.ok("success");
     }

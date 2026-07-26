@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>루틴 현황</title>
     <link rel="stylesheet" th:href="@{/css/routine.css}" href="/css/routine.css">
+    <script th:src="@{/js/dialog.js}" src="/js/dialog.js"></script>
 </head>
 <body>
 
@@ -189,16 +190,16 @@
 
     // ─── 어드민: 데몬 수동 실행 ───────────────────
     async function runDaemon(daemonName, path) {
-        if (!confirm(daemonName + '를 지금 수동으로 실행할까요?')) return;
+        if (!(await showConfirm(daemonName + '를 지금 수동으로 실행할까요?'))) return;
 
         try {
             const response = await fetch('/admin/daemon/' + path, { method: 'POST' });
             const message  = await response.text();
             if (!response.ok) throw new Error(message);
-            alert(message);
+            showAlert(message);
         } catch (error) {
             console.error('Daemon run failed:', error);
-            alert(daemonName + ' 실행 중 오류가 발생했어요: ' + error.message);
+            showAlert(daemonName + ' 실행 중 오류가 발생했어요: ' + error.message);
         }
     }
 </script>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>루틴 설정</title>
     <link rel="stylesheet" th:href="@{/css/routine.css}" href="/css/routine.css">
+    <script th:src="@{/js/dialog.js}" src="/js/dialog.js"></script>
 </head>
 <body>
 
@@ -236,8 +237,17 @@
                 <td class="col-hide-sm" th:text="${routineSettingDto.daysOfWeekView}"></td>
                 <td class="col-hide-sm start-week" th:text="${routineSettingDto.startYmd}"></td>
                 <td class="col-action">
-                    <button type="button" class="btn-delete"
-                            th:attr="onclick=|deleteRoutine(${routineSettingDto.seqNo}, this)|">삭제</button>
+                    <div class="row-actions">
+                        <button type="button" class="btn-edit"
+                                th:attr="data-seq-no=${routineSettingDto.seqNo},
+                                         data-type=${routineSettingDto.routineType},
+                                         data-target=${routineSettingDto.targetValue.intValue()},
+                                         data-limit=${routineSettingDto.dailyLimit.intValue()},
+                                         data-days=${routineSettingDto.daysOfWeek}"
+                                onclick="openEditModal(this)">수정</button>
+                        <button type="button" class="btn-delete"
+                                th:attr="onclick=|deleteRoutine(${routineSettingDto.seqNo}, this)|">삭제</button>
+                    </div>
                 </td>
             </tr>
 
@@ -245,6 +255,88 @@
         </table>
     </div>
 
+</div>
+
+<!-- ══════════════════════════
+     루틴 수정 모달
+══════════════════════════ -->
+<div class="modal-overlay" id="editModal" onclick="onEditModalOverlayClick(event)">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">루틴 수정</h3>
+            <button type="button" class="modal-close" onclick="closeEditModal()" aria-label="닫기">×</button>
+        </div>
+
+        <p class="modal-note">✏️ 변경한 <b>주간 목표</b>와 <b>1일 최대 한도</b>는 <b>다음 주부터</b> 적용돼요.</p>
+
+        <div class="modal-body" id="editGoalCell">
+
+            <!-- 체크형 -->
+            <div id="edit-goal-CHECK" class="goal-block">
+                <div class="goal-main">
+                    <input type="number" id="editCheckGoal" min="1" value="1">
+                    <span class="unit">회 / 주</span>
+                    <span class="check-max-hint" id="editCheckMaxHint"></span>
+                </div>
+                <div class="error-msg" id="editCheckGoalError">선택한 요일 수를 초과할 수 없어요.</div>
+            </div>
+
+            <!-- 누적형 -->
+            <div id="edit-goal-COUNT" class="goal-block">
+                <div class="goal-main">
+                    <input type="number" id="editCountGoal" min="1" value="10">
+                    <span class="unit">회 / 주</span>
+                    <button type="button" class="toggle-limit-btn" onclick="toggleEditLimit('COUNT')">1일 최대 한도 설정</button>
+                </div>
+                <div class="daily-limit-area" id="edit-limit-COUNT">
+                    <span class="limit-label">1일 최대</span>
+                    <input type="number" id="editCountLimit" min="1" value="1">
+                    <span class="unit">회</span>
+                </div>
+                <div class="error-msg" id="editCountLimitError">1일 최대 한도가 주간 목표보다 클 수 없어요.</div>
+            </div>
+
+            <!-- 시간 -->
+            <div id="edit-goal-TIME" class="goal-block">
+                <div class="goal-main">
+                    <input type="number" class="input-sm" id="editTimeGoalHour" min="0" value="1">
+                    <span class="unit">시간</span>
+                    <input type="number" class="input-sm" id="editTimeGoalMin" min="0" max="59" value="0">
+                    <span class="unit">분 / 주</span>
+                    <button type="button" class="toggle-limit-btn" onclick="toggleEditLimit('TIME')">1일 최대 한도 설정</button>
+                </div>
+                <div class="daily-limit-area" id="edit-limit-TIME">
+                    <span class="limit-label">1일 최대</span>
+                    <input type="number" class="input-sm" id="editTimeLimitHour" min="0" value="0">
+                    <span class="unit">시간</span>
+                    <input type="number" class="input-sm" id="editTimeLimitMin" min="0" max="59" value="30">
+                    <span class="unit">분</span>
+                </div>
+                <div class="error-msg" id="editTimeLimitError">1일 최대 한도가 주간 목표보다 클 수 없어요.</div>
+            </div>
+
+            <!-- km -->
+            <div id="edit-goal-KM" class="goal-block">
+                <div class="goal-main">
+                    <input type="number" id="editDistGoal" min="0.01" step="0.01" value="5.00" style="width:90px;">
+                    <span class="unit">km / 주</span>
+                    <button type="button" class="toggle-limit-btn" onclick="toggleEditLimit('KM')">1일 최대 한도 설정</button>
+                </div>
+                <div class="daily-limit-area" id="edit-limit-KM">
+                    <span class="limit-label">1일 최대</span>
+                    <input type="number" id="editDistLimit" min="0.01" step="0.01" value="1.00" style="width:90px;">
+                    <span class="unit">km</span>
+                </div>
+                <div class="error-msg" id="editDistLimitError">1일 최대 한도가 주간 목표보다 클 수 없어요.</div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">취소</button>
+            <button type="button" class="btn-modal-save" onclick="saveEdit()">수정하기</button>
+        </div>
+    </div>
 </div>
 
 
@@ -299,16 +391,16 @@
 
     // ─── 어드민: 데몬 수동 실행 ───────────────────
     async function runDaemon(daemonName, path) {
-        if (!confirm(daemonName + '를 지금 수동으로 실행할까요?')) return;
+        if (!(await showConfirm(daemonName + '를 지금 수동으로 실행할까요?'))) return;
 
         try {
             const response = await fetch('/admin/daemon/' + path, { method: 'POST' });
             const message  = await response.text();
             if (!response.ok) throw new Error(message);
-            alert(message);
+            showAlert(message);
         } catch (error) {
             console.error('Daemon run failed:', error);
-            alert(daemonName + ' 실행 중 오류가 발생했어요: ' + error.message);
+            showAlert(daemonName + ' 실행 중 오류가 발생했어요: ' + error.message);
         }
     }
 
@@ -438,8 +530,8 @@
     // ─── 저장 ────────────────────────────────────
     async function saveRoutine() {
         const title = document.getElementById('title').value.trim();
-        if (!title) { alert('루틴명을 입력해 줘!'); return; }
-        if (getSelectedDayCount() === 0) { alert('수행할 요일을 하나 이상 선택해 줘!'); return; }
+        if (!title) { showAlert('루틴명을 입력해 줘!'); return; }
+        if (getSelectedDayCount() === 0) { showAlert('수행할 요일을 하나 이상 선택해 줘!'); return; }
         const type = getSelectedType();
         if (!validate(type)) return;
         const requestData = buildRequestData(type);
@@ -450,10 +542,10 @@
             if (response.ok) {
                 const seqNo = await response.text(); // 서버가 생성된 루틴 seqNo 반환
                 addRoutineToList(requestData, seqNo);
-                alert('루틴이 등록됐어!');
+                showAlert('루틴이 등록됐어!');
                 resetForm();
             }
-            else alert('등록에 실패했어. 다시 시도해 봐.');
+            else showAlert('등록에 실패했어. 다시 시도해 봐.');
         } catch (e) { console.error(e); }
     }
 
@@ -482,7 +574,14 @@
             <td class="col-hide-sm">${convertToDays(data.daysOfWeek)}</td>
             <td class="col-hide-sm start-week">${data.startYmd}</td>
             <td class="col-action">
-                <button type="button" class="btn-delete" onclick="deleteRoutine(${seqNo}, this)">삭제</button>
+                <div class="row-actions">
+                    <button type="button" class="btn-edit"
+                            data-seq-no="${seqNo}" data-type="${data.routineType}"
+                            data-target="${data.targetValue}" data-limit="${data.dailyLimit || 0}"
+                            data-days="${data.daysOfWeek}"
+                            onclick="openEditModal(this)">수정</button>
+                    <button type="button" class="btn-delete" onclick="deleteRoutine(${seqNo}, this)">삭제</button>
+                </div>
             </td>
         `;
         tbody.insertBefore(tr, tbody.firstChild);
@@ -490,7 +589,7 @@
 
     // ─── 루틴 삭제 ────────────────────────────────
     async function deleteRoutine(seqNo, btn) {
-        if (!confirm('이 루틴을 삭제할까요?\n진행 중인 이번 주 사이클과 아직 안 한 일일 루틴도 함께 취소돼요.')) return;
+        if (!(await showConfirm('이 루틴을 삭제할까요?\n진행 중인 이번 주 사이클과 아직 안 한 일일 루틴도 함께 취소돼요.'))) return;
         try {
             const response = await fetch('/api/routine/' + seqNo, { method: 'DELETE' });
             if (!response.ok) throw new Error('삭제 실패');
@@ -514,7 +613,168 @@
             }
         } catch (e) {
             console.error(e);
-            alert('삭제에 실패했어. 다시 시도해 봐.');
+            showAlert('삭제에 실패했어. 다시 시도해 봐.');
+        }
+    }
+
+    // ─── 루틴 수정 (모달) ─────────────────────────
+    let editingRow = null;      // 수정 중인 <tr>
+    let editingSeqNo = null;    // 수정 중인 루틴 seqNo
+    let editingType = null;     // 수정 중인 루틴 타입
+    let editingDayCount = 0;    // 수행 요일 수 (CHECK 목표 상한)
+
+    function toggleEditLimit(type) {
+        document.getElementById('edit-limit-' + type).classList.toggle('open');
+    }
+    function clearEditErrors() {
+        document.querySelectorAll('#editGoalCell .error-msg').forEach(el => el.classList.remove('visible'));
+    }
+    function showEditError(id) { document.getElementById(id).classList.add('visible'); }
+
+    function openEditModal(btn) {
+        editingRow = btn.closest('tr');
+        editingSeqNo = btn.dataset.seqNo;
+        editingType = btn.dataset.type;
+        const target = parseInt(btn.dataset.target);
+        const limit = parseInt(btn.dataset.limit) || 0;
+        editingDayCount = btn.dataset.days.split(',').filter(s => s.trim() !== '').length;
+
+        // 초기화: 모든 목표 블록/한도 영역 숨기고 에러 제거
+        document.querySelectorAll('#editGoalCell .goal-block').forEach(el => el.classList.remove('visible'));
+        document.querySelectorAll('#editGoalCell .daily-limit-area').forEach(el => el.classList.remove('open'));
+        clearEditErrors();
+
+        // 해당 타입 블록만 표시 + 현재값 프리필
+        document.getElementById('edit-goal-' + editingType).classList.add('visible');
+
+        if (editingType === 'CHECK') {
+            const input = document.getElementById('editCheckGoal');
+            input.value = target;
+            input.max = editingDayCount;
+            document.getElementById('editCheckMaxHint').textContent = '(최대 ' + editingDayCount + '회)';
+        } else if (editingType === 'COUNT') {
+            document.getElementById('editCountGoal').value = target;
+            if (limit > 0) {
+                document.getElementById('edit-limit-COUNT').classList.add('open');
+                document.getElementById('editCountLimit').value = limit;
+            }
+        } else if (editingType === 'TIME') {
+            document.getElementById('editTimeGoalHour').value = Math.floor(target / 60);
+            document.getElementById('editTimeGoalMin').value = target % 60;
+            if (limit > 0) {
+                document.getElementById('edit-limit-TIME').classList.add('open');
+                document.getElementById('editTimeLimitHour').value = Math.floor(limit / 60);
+                document.getElementById('editTimeLimitMin').value = limit % 60;
+            }
+        } else if (editingType === 'KM') {
+            document.getElementById('editDistGoal').value = (target / 1000).toFixed(2);
+            if (limit > 0) {
+                document.getElementById('edit-limit-KM').classList.add('open');
+                document.getElementById('editDistLimit').value = (limit / 1000).toFixed(2);
+            }
+        }
+
+        document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('open');
+        editingRow = null;
+        editingSeqNo = null;
+        editingType = null;
+    }
+    function onEditModalOverlayClick(event) {
+        // 카드 바깥(오버레이) 클릭 시에만 닫기
+        if (event.target.id === 'editModal') closeEditModal();
+    }
+
+    // 수정값 유효성 검사 (등록 폼 validate와 동일 규칙)
+    function validateEdit(type) {
+        clearEditErrors();
+        if (type === 'CHECK') {
+            const val = parseInt(document.getElementById('editCheckGoal').value);
+            if (!val || val < 1 || val > editingDayCount) { showEditError('editCheckGoalError'); return false; }
+        }
+        if (type === 'COUNT') {
+            const goal = parseInt(document.getElementById('editCountGoal').value);
+            if (!goal || goal < 1) { showEditError('editCountLimitError'); return false; }
+            if (document.getElementById('edit-limit-COUNT').classList.contains('open')) {
+                const limit = parseInt(document.getElementById('editCountLimit').value);
+                if (limit && limit > goal) { showEditError('editCountLimitError'); return false; }
+            }
+        }
+        if (type === 'TIME') {
+            const goalMin = toMinutes(document.getElementById('editTimeGoalHour').value, document.getElementById('editTimeGoalMin').value);
+            if (goalMin < 1) { showEditError('editTimeLimitError'); return false; }
+            if (document.getElementById('edit-limit-TIME').classList.contains('open')) {
+                const lm = toMinutes(document.getElementById('editTimeLimitHour').value, document.getElementById('editTimeLimitMin').value);
+                if (lm > goalMin) { showEditError('editTimeLimitError'); return false; }
+            }
+        }
+        if (type === 'KM') {
+            const goal = parseFloat(document.getElementById('editDistGoal').value);
+            if (!goal || goal <= 0) { showEditError('editDistLimitError'); return false; }
+            if (document.getElementById('edit-limit-KM').classList.contains('open')) {
+                const limit = parseFloat(document.getElementById('editDistLimit').value);
+                if (limit && limit > goal) { showEditError('editDistLimitError'); return false; }
+            }
+        }
+        return true;
+    }
+
+    // 수정 요청 데이터 빌드 (targetValue, dailyLimit — 등록과 동일한 원본 단위)
+    function buildEditData(type) {
+        let targetValue = null, dailyLimit = 0;
+        if (type === 'CHECK') {
+            targetValue = parseInt(document.getElementById('editCheckGoal').value);
+            dailyLimit = 1;
+        }
+        if (type === 'COUNT') {
+            targetValue = parseInt(document.getElementById('editCountGoal').value);
+            if (document.getElementById('edit-limit-COUNT').classList.contains('open'))
+                dailyLimit = parseInt(document.getElementById('editCountLimit').value) || 0;
+        }
+        if (type === 'TIME') {
+            targetValue = toMinutes(document.getElementById('editTimeGoalHour').value, document.getElementById('editTimeGoalMin').value);
+            if (document.getElementById('edit-limit-TIME').classList.contains('open')) {
+                const lm = toMinutes(document.getElementById('editTimeLimitHour').value, document.getElementById('editTimeLimitMin').value);
+                if (lm > 0) dailyLimit = lm;
+            }
+        }
+        if (type === 'KM') {
+            targetValue = toMeters(document.getElementById('editDistGoal').value);
+            if (document.getElementById('edit-limit-KM').classList.contains('open')) {
+                const lm = toMeters(document.getElementById('editDistLimit').value);
+                if (lm > 0) dailyLimit = lm;
+            }
+        }
+        return { targetValue, dailyLimit };
+    }
+
+    async function saveEdit() {
+        if (!validateEdit(editingType)) return;
+        const data = buildEditData(editingType);
+        try {
+            const response = await fetch('/api/routine/' + editingSeqNo, {
+                method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+            });
+            if (!response.ok) throw new Error('수정 실패');
+
+            // 목록 행 표시 갱신
+            const cells = editingRow.querySelectorAll('td');
+            cells[2].textContent = formatGoal(editingType, data.targetValue);
+            cells[3].textContent = data.dailyLimit > 0 ? formatGoal(editingType, data.dailyLimit) : '-';
+
+            // 수정 버튼 data 값 갱신 (다시 열 때 최신값 반영)
+            const editBtn = editingRow.querySelector('.btn-edit');
+            editBtn.dataset.target = data.targetValue;
+            editBtn.dataset.limit = data.dailyLimit;
+
+            closeEditModal();
+            showAlert('루틴이 수정됐어! 다음 주부터 적용돼.');
+        } catch (e) {
+            console.error(e);
+            showAlert('수정에 실패했어. 다시 시도해 봐.');
         }
     }
 

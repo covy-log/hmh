@@ -185,8 +185,11 @@ public class ViewController {
                     .seqNo(routine.getSeqNo())
                     .title(routine.getTitle())
                     .routineType(routine.getRoutineType())
+                    .targetValue(routine.getTargetValue())
                     .targetValueView(targetValueView)
+                    .dailyLimit(routine.getDailyLimit())
                     .dailyLimitView(dailyLimitView)
+                    .daysOfWeek(routine.getDaysOfWeek())
                     .daysOfWeekView(daysOfWeekView)
                     .startYmd(routine.getStartYmd())
                     .build();

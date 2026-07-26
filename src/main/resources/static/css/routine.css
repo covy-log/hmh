@@ -808,6 +808,161 @@ input.form-input.input-error { border-color: #e5484d; }
 .btn-delete:hover  { background: var(--danger); color: #fff; }
 .btn-delete:active { transform: translateY(1px); }
 
+/* 행 액션 버튼 묶음 (수정 + 삭제) */
+.row-actions {
+    display: inline-flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+.btn-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+}
+.btn-edit:hover  { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.btn-edit:active { transform: translateY(1px); }
+
+/* ══════════════════════════════════════════════
+   수정 모달
+══════════════════════════════════════════════ */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    padding: 24px;
+    animation: modalPop 0.16s ease-out;
+}
+@keyframes modalPop {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: var(--font-label);
+}
+.modal-close {
+    border: none;
+    background: none;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--text-hint);
+    cursor: pointer;
+    padding: 0 4px;
+    transition: color var(--transition);
+}
+.modal-close:hover { color: var(--text-primary); }
+.modal-note {
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--accent-light);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+.modal-body { margin-bottom: 22px; }
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.btn-modal-cancel,
+.btn-modal-save {
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+}
+.btn-modal-cancel {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+}
+.btn-modal-cancel:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+.btn-modal-save {
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 16px var(--accent-glow);
+}
+.btn-modal-save:hover  { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-modal-save:active { transform: translateY(0); }
+
+/* ══════════════════════════════════════════════
+   공용 안내/확인 팝업 (showAlert / showConfirm)
+══════════════════════════════════════════════ */
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1100; /* 수정 모달(1000) 위에 표시 */
+    background: rgba(0, 0, 0, 0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.dialog-overlay.open { display: flex; }
+.dialog-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    padding: 24px;
+    animation: modalPop 0.16s ease-out;
+}
+.dialog-message {
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    white-space: pre-line; /* '\n' 줄바꿈 반영 */
+    word-break: keep-all;
+    margin-bottom: 22px;
+    text-align: center;
+}
+.dialog-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
 .status-badge {
     display: inline-flex;
     align-items: center;
