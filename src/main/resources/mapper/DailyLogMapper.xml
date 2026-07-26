@@ -28,6 +28,7 @@
         INNER JOIN routine r ON rc.routine_seq_no = r.seq_no
         WHERE dl.member_seq_no = #{memberSeqNo}
         AND dl.todo_ymd = #{todoYmd}
+        AND rc.status = 'IN_PROGRESS'
     </select>
 
     <select id="findAllByCycleSeqNo" parameterType="long" resultType="DailyLog">
@@ -71,4 +72,15 @@
         AND dl.status != 'TODO'
         ORDER BY dl.todo_ymd DESC, dl.completed_at DESC
     </select>
+
+    <update id="cancelByRoutineSeqNo">
+        UPDATE daily_log
+        SET status = 'CANCEL',
+            change_at = NOW()
+        WHERE cycle_seq_no IN (
+            SELECT seq_no FROM routine_cycle WHERE routine_seq_no = #{routineSeqNo}
+        )
+        AND member_seq_no = #{memberSeqNo}
+        AND status = 'TODO'
+    </update>
 </mapper>

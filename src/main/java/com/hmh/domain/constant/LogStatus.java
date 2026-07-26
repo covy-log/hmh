@@ -4,7 +4,8 @@ public enum LogStatus {
 
     TODO ("진행중"),
     DONE ("완료"),
-    FAIL ("실패");
+    FAIL ("실패"),
+    CANCEL ("취소");
 
     private String description;
 

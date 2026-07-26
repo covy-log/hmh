@@ -4,6 +4,7 @@ import com.hmh.domain.DailyLog;
 import com.hmh.dto.Routine.DailyLogDto;
 import com.hmh.dto.Routine.DailyLogHistoryDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -59,4 +60,12 @@ public interface DailyLogMapper {
      * @return
      */
     List<DailyLogHistoryDto> findHistoryByMemberSeqNo(Long memberSeqNo);
+
+    /**
+     * 특정 루틴에 속한 아직 수행하지 않은(TODO) 일일 기록을 취소(status = 'CANCEL') 처리
+     * (루틴 삭제 시 남아있는 오늘/미래 할 일을 함께 정리하기 위함. 완료/실패 기록은 이력으로 보존)
+     * @param routineSeqNo 루틴 고유번호
+     * @param memberSeqNo 회원 고유번호 (본인 데이터만 처리되도록 제한)
+     */
+    void cancelByRoutineSeqNo(@Param("routineSeqNo") Long routineSeqNo, @Param("memberSeqNo") Long memberSeqNo);
 }

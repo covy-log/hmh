@@ -17,6 +17,11 @@ import java.time.LocalDate;
 public class RoutineSettingDto {
 
     /**
+     * 루틴 고유번호 (삭제 등에 사용)
+     */
+    private Long seqNo;
+
+    /**
      * 루틴명
      */
     @NotBlank(message = "루틴 명을 입력해주세요.")

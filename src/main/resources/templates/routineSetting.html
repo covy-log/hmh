@@ -214,12 +214,13 @@
                 <th>1일 최대</th>
                 <th class="col-hide-sm">수행 요일</th>
                 <th class="col-hide-sm">시작 주</th>
+                <th class="col-action"></th>
             </tr>
             </thead>
             <tbody id="routineListBody">
 
             <tr th:if="${#lists.isEmpty(routineSettingDtoList)}" id="emptyMessageRow">
-                <td colspan="6">
+                <td colspan="7">
                     <div class="empty-state">
                         <span class="empty-icon">📋</span>
                         등록된 루틴이 없어요. 첫 루틴을 등록해 보세요!
@@ -234,6 +235,10 @@
                 <td th:text="${routineSettingDto.dailyLimitView}"></td>
                 <td class="col-hide-sm" th:text="${routineSettingDto.daysOfWeekView}"></td>
                 <td class="col-hide-sm start-week" th:text="${routineSettingDto.startYmd}"></td>
+                <td class="col-action">
+                    <button type="button" class="btn-delete"
+                            th:attr="onclick=|deleteRoutine(${routineSettingDto.seqNo}, this)|">삭제</button>
+                </td>
             </tr>
 
             </tbody>
@@ -442,7 +447,12 @@
             const response = await fetch('/api/routine/save', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestData)
             });
-            if (response.ok) { addRoutineToList(requestData); alert('루틴이 등록됐어!'); resetForm(); }
+            if (response.ok) {
+                const seqNo = await response.text(); // 서버가 생성된 루틴 seqNo 반환
+                addRoutineToList(requestData, seqNo);
+                alert('루틴이 등록됐어!');
+                resetForm();
+            }
             else alert('등록에 실패했어. 다시 시도해 봐.');
         } catch (e) { console.error(e); }
     }
@@ -459,7 +469,7 @@
     }
 
     // ─── 목록 행 추가 ─────────────────────────────
-    function addRoutineToList(data) {
+    function addRoutineToList(data, seqNo) {
         const tbody = document.getElementById('routineListBody');
         const empty = document.getElementById('emptyMessageRow');
         if (empty) empty.remove();
@@ -471,8 +481,41 @@
             <td>${data.dailyLimit ? formatGoal(data.routineType, data.dailyLimit) : '-'}</td>
             <td class="col-hide-sm">${convertToDays(data.daysOfWeek)}</td>
             <td class="col-hide-sm start-week">${data.startYmd}</td>
+            <td class="col-action">
+                <button type="button" class="btn-delete" onclick="deleteRoutine(${seqNo}, this)">삭제</button>
+            </td>
         `;
         tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    // ─── 루틴 삭제 ────────────────────────────────
+    async function deleteRoutine(seqNo, btn) {
+        if (!confirm('이 루틴을 삭제할까요?\n진행 중인 이번 주 사이클과 아직 안 한 일일 루틴도 함께 취소돼요.')) return;
+        try {
+            const response = await fetch('/api/routine/' + seqNo, { method: 'DELETE' });
+            if (!response.ok) throw new Error('삭제 실패');
+
+            const row = btn.closest('tr');
+            row.remove();
+
+            // 목록이 비면 빈 상태 메시지 복원
+            const tbody = document.getElementById('routineListBody');
+            if (!tbody.querySelector('tr')) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.id = 'emptyMessageRow';
+                emptyRow.innerHTML = `
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <span class="empty-icon">📋</span>
+                            등록된 루틴이 없어요. 첫 루틴을 등록해 보세요!
+                        </div>
+                    </td>`;
+                tbody.appendChild(emptyRow);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('삭제에 실패했어. 다시 시도해 봐.');
+        }
     }
 
     function typeLabel(t) { return { CHECK:'체크형', COUNT:'누적형', TIME:'시간', KM:'km' }[t] || t; }

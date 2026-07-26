@@ -46,4 +46,27 @@
         ORDER BY r.create_at DESC
     </select>
 
+    <update id="recalculateAchievedValueByDailyLogSeqNo" parameterType="long">
+        UPDATE routine_cycle
+        SET current_achieved_value = (
+                SELECT COALESCE(SUM(dl.achieved_value), 0)
+                FROM daily_log dl
+                WHERE dl.cycle_seq_no = routine_cycle.seq_no
+                AND dl.status = 'DONE'
+            ),
+            change_at = NOW()
+        WHERE seq_no = (
+            SELECT cycle_seq_no FROM daily_log WHERE seq_no = #{dailyLogSeqNo}
+        )
+    </update>
+
+    <update id="cancelByRoutineSeqNo">
+        UPDATE routine_cycle
+        SET status = 'CANCEL',
+            change_at = NOW()
+        WHERE routine_seq_no = #{routineSeqNo}
+        AND member_seq_no = #{memberSeqNo}
+        AND status = 'IN_PROGRESS'
+    </update>
+
 </mapper>

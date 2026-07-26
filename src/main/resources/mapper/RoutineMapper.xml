@@ -27,4 +27,13 @@
         AND start_ymd <![CDATA[<=]]> #{startYmd}
     </select>
 
+    <update id="deleteBySeqNo">
+        UPDATE routine
+        SET status = 'DELETE',
+            change_at = NOW()
+        WHERE seq_no = #{seqNo}
+        AND member_seq_no = #{memberSeqNo}
+        AND status = 'IN_PROGRESS'
+    </update>
+
 </mapper>

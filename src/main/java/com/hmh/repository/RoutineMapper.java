@@ -2,6 +2,7 @@ package com.hmh.repository;
 
 import com.hmh.domain.Routine;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -34,4 +35,11 @@ public interface RoutineMapper {
      * @param routine
      */
     void update(Routine routine);
+
+    /**
+     * 루틴 소프트 삭제 (status = 'DELETE')
+     * @param seqNo 루틴 고유번호
+     * @param memberSeqNo 회원 고유번호 (본인 루틴만 삭제되도록 제한)
+     */
+    void deleteBySeqNo(@Param("seqNo") Long seqNo, @Param("memberSeqNo") Long memberSeqNo);
 }

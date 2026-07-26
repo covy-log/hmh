@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,13 +92,25 @@ public class RoutineApiController {
                 }
             }
 
-            // 성공 시 201 Created 상태 코드 반환
-            return ResponseEntity.status(HttpStatus.CREATED).body("success");
+            // 성공 시 201 Created 와 함께 생성된 루틴의 seqNo 반환 (프론트에서 삭제 버튼에 사용)
+            return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(routine.getSeqNo()));
 
         } catch (IllegalStateException e) {
             // 중복 루틴인 경우
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
+    }
+
+    @DeleteMapping("/{seqNo}")
+    public ResponseEntity<String> delete(@PathVariable Long seqNo,
+                                         HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        Long memberSeqNo = (Long) session.getAttribute(Const.LOGIN_MEMBER);
+
+        routineService.delete(seqNo, memberSeqNo);
+
+        return ResponseEntity.ok("success");
     }
 
     @PostMapping("update")

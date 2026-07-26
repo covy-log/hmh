@@ -783,6 +783,31 @@ input.form-input.input-error { border-color: #e5484d; }
     color: var(--accent);
 }
 
+/* ── 삭제 버튼 (행 오른쪽 끝) ── */
+.routine-table .col-action {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+}
+.btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-sm);
+    background: var(--danger-light);
+    color: var(--danger);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.btn-delete:hover  { background: var(--danger); color: #fff; }
+.btn-delete:active { transform: translateY(1px); }
+
 .status-badge {
     display: inline-flex;
     align-items: center;

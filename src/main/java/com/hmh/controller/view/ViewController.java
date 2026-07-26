@@ -182,6 +182,7 @@ public class ViewController {
             String dailyLimitView = dailyLimitCnt > 0 ? convertValueView(routine.getRoutineType(), dailyLimitCnt) : Const.UNIT_NULL;
 
             RoutineSettingDto routineSettingDto = RoutineSettingDto.builder()
+                    .seqNo(routine.getSeqNo())
                     .title(routine.getTitle())
                     .routineType(routine.getRoutineType())
                     .targetValueView(targetValueView)
