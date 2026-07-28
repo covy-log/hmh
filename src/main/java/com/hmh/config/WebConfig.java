@@ -22,6 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/", "/login", "/signup", // 첫 페이지, 로그인, 회원가입 페이지는 통과
                         "/api/**", // API 통과
+                        "/ping", // 외부 크론(keep-alive) 호출은 비로그인 통과
                         "/css/**", "/js/**", "/*.ico", "/error" // 정적 리소스 및 에러 페이지 통과
                 );
 
