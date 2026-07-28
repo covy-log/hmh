@@ -1283,6 +1283,20 @@ input.form-input.input-error { border-color: #e5484d; }
 
 /* ── 터치 기기 — 탭 타깃 최소 44px 확보 ── */
 @media (hover: none) and (pointer: coarse) {
+    /* iOS Safari 는 글자 크기가 16px 미만인 입력창에 포커스가 가면 화면을 강제로 확대한다.
+       확대를 막으려고 viewport 에 user-scalable=no 를 주면 손가락 확대까지 막혀 접근성이 나빠지고,
+       iOS Safari 는 그 값을 무시하기도 한다. 정공법은 입력창 글자를 16px 로 키우는 것. */
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="week"],
+    input[type="email"],
+    input.form-input { font-size: 16px; }
+
+    /* 글자가 커진 만큼 숫자 입력칸도 넓혀야 값이 잘리지 않는다 (오른쪽 30px 은 스피너 자리) */
+    input[type="number"] { width: 88px; }
+    input.input-sm       { width: 72px; }
+
     .nav-btn,
     .btn-edit,
     .btn-delete,
