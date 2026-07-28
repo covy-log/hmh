@@ -383,7 +383,8 @@ body {
 }
 
 .form-card  { padding: 28px 28px 24px; margin-bottom: 32px; }
-.list-card  { overflow: hidden; margin-bottom: 32px; }
+/* overflow-x: auto — 좁은 화면에서 표가 넘칠 때 카드 안에서만 가로 스크롤 (세로는 hidden 유지해 라운드 모서리 클리핑 보존) */
+.list-card  { overflow: hidden; overflow-x: auto; margin-bottom: 32px; }
 
 /* ══════════════════════════════════════════════
    Form Field Rows (routineSetting)
@@ -971,6 +972,14 @@ input.form-input.input-error { border-color: #e5484d; }
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
+    white-space: nowrap; /* 좁은 셀에서 '성공'이 한 글자씩 세로로 쪼개지는 것 방지 */
+}
+
+/* 배지가 들어가는 상태 컬럼 — 체크박스용 .check-cell(52px 고정)과 달리 내용 폭에 맞춰 늘어남 */
+.status-cell {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
 }
 .status-badge.done,
 .status-badge.success {
@@ -1085,6 +1094,10 @@ input.form-input.input-error { border-color: #e5484d; }
 
 /* ── 루틴명 (완료 시 취소선) ── */
 .routine-name { font-weight: 500; transition: color var(--transition); }
+
+/* 루틴명 아래 보조 정보 줄 — 데스크톱에서는 전용 컬럼이 있으므로 감춰둔다.
+   모바일(≤600px)에서 .col-hide-sm 컬럼이 사라질 때만 노출된다. */
+.row-sub { display: none; }
 .row-done .routine-name {
     color: var(--text-hint);
     text-decoration: line-through;
@@ -1134,7 +1147,20 @@ input.form-input.input-error { border-color: #e5484d; }
 /* ══════════════════════════════════════════════
    Responsive
 ══════════════════════════════════════════════ */
+/* 로그인·회원가입 카드 안에서는 입력창이 카드 폭을 꽉 채우도록
+   (전역 input 규칙의 max-width: 300px 때문에 420px 카드 안에서 작아 보이는 문제) */
+.auth-form input[type="text"],
+.auth-form input[type="password"] { max-width: 100%; }
+
+/* ── 태블릿 (≤1024px) ── */
+@media (max-width: 1024px) {
+    body { padding: 0 20px 64px; }
+    .page-wrapper { padding-top: 32px; }
+}
+
+/* ── 모바일 (≤600px) ── */
 @media (max-width: 600px) {
+    body { padding: 0 12px 56px; }
     .page-wrapper { padding-top: 24px; }
     .form-card    { padding: 20px 16px; }
 
@@ -1145,6 +1171,27 @@ input.form-input.input-error { border-color: #e5484d; }
     }
     .field-label { padding-top: 0; }
 
+    /* 수행 요일 — flex 자동 줄바꿈이면 '일'만 다음 줄로 밀린다.
+       7등분 그리드로 고정해 요일 7개가 항상 한 줄에 들어가도록 한다. */
+    .days-row {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        /* .field-content 가 flex 컨테이너라 이 grid 는 flex 아이템이 된다.
+           폭을 명시하지 않으면 내용 크기로 줄어들어 1fr 이 나눌 공간이 없어진다. */
+        width: 100%;
+    }
+    .days-row .sep { display: none; }
+    .days-row .any-day {
+        grid-column: 1 / -1;   /* '매일'은 요일 위에서 한 줄 전체를 차지 */
+        justify-content: center;
+        padding: 8px 0;
+    }
+    .days-row .day-chip:not(.any-day) {
+        justify-content: center;
+        padding: 10px 0;       /* 좌우 패딩 제거 — 칸 폭은 그리드가 결정 */
+    }
+
     .nav-btn  { font-size: 13px; padding: 9px 0; }
 
     .type-chip { padding: 7px 12px; font-size: 12px; }
@@ -1154,6 +1201,55 @@ input.form-input.input-error { border-color: #e5484d; }
 
     input[type="text"],input[type="password"] { max-width: 100%; width: 100%; }
 
-    /* 리스트 테이블 — 작은 화면에서 일부 컬럼 숨김 */
+    .section-title { font-size: 16px; }
+    .list-card     { margin-bottom: 24px; }
+
+    /* 리스트 테이블 — 작은 화면에서 일부 컬럼 숨김 (숨긴 값은 .row-sub로 대체 노출) */
     .routine-table .col-hide-sm { display: none; }
+
+    .row-sub {
+        display: block;
+        margin-top: 3px;
+        font-size: 11px;
+        line-height: 1.5;
+        color: var(--text-hint);
+        font-family: var(--font-label);
+    }
+
+    /* 셀 여백을 줄여 좁은 화면에서 표가 넘치지 않도록 */
+    .routine-table th { padding: 11px 10px; }
+    .routine-table td { padding: 12px 10px; }
+
+    /* 진행률 바 최소폭 축소 — 160px 고정이면 390px 화면에서 표가 넘침 */
+    .progress-cell   { min-width: 96px; }
+    .progress-wrapper { gap: 6px; }
+
+    .value-cell { min-width: 92px; }
+}
+
+/* ── 소형 폰 (≤430px) ── */
+@media (max-width: 430px) {
+    .routine-table    { font-size: 13px; }
+    .routine-table th { padding: 10px 8px; font-size: 10px; }
+    .routine-table td { padding: 11px 8px; }
+
+    .progress-cell    { min-width: 76px; }
+    .progress-percent { min-width: 32px; font-size: 11px; }
+
+    .stats-grid { gap: 6px; }
+    .stat-value { font-size: 22px; }
+
+    .empty-state { padding: 40px 16px; }
+}
+
+/* ── 터치 기기 — 탭 타깃 최소 44px 확보 ── */
+@media (hover: none) and (pointer: coarse) {
+    .nav-btn,
+    .btn-edit,
+    .btn-delete,
+    .dropdown-item,
+    .btn-social { min-height: 44px; }
+
+    .profile-btn,
+    .theme-toggle { min-width: 44px; min-height: 44px; }
 }

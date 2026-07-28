@@ -100,7 +100,7 @@
                 <th>날짜</th>
                 <th>루틴명</th>
                 <th>수행 결과</th>
-                <th class="check-cell">상태</th>
+                <th class="status-cell">상태</th>
             </tr>
             </thead>
             <tbody>
@@ -127,7 +127,7 @@
                     <span class="value-unit">/ <span th:text="${history.targetValueView}">5km</span></span>
                 </td>
 
-                <td class="check-cell">
+                <td class="status-cell">
                     <span th:if="${history.success}" class="status-badge success">성공</span>
                     <span th:unless="${history.success}" class="status-badge fail">미달</span>
                 </td>

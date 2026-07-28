@@ -210,7 +210,7 @@
             <thead>
             <tr>
                 <th>루틴명</th>
-                <th>타입</th>
+                <th class="col-hide-sm">타입</th>
                 <th>주간 목표</th>
                 <th>1일 최대</th>
                 <th class="col-hide-sm">수행 요일</th>
@@ -230,8 +230,13 @@
             </tr>
 
             <tr th:unless="${#lists.isEmpty(routineSettingDtoList)}" th:each="routineSettingDto : ${routineSettingDtoList}">
-                <td th:text="${routineSettingDto.title}"></td>
-                <td><span class="type-badge" th:text="${routineSettingDto.routineType}"></span></td>
+                <td>
+                    <span class="routine-name" th:text="${routineSettingDto.title}"></span>
+                    <!-- 모바일에서만 노출 — 좁은 화면에서 숨겨지는 수행 요일·시작 주를 한 줄씩 보여준다 -->
+                    <span class="row-sub" th:text="${routineSettingDto.daysOfWeekView}"></span>
+                    <span class="row-sub" th:text="${routineSettingDto.startYmd}"></span>
+                </td>
+                <td class="col-hide-sm"><span class="type-badge" th:text="${routineSettingDto.routineType?.label}"></span></td>
                 <td th:text="${routineSettingDto.targetValueView}"></td>
                 <td th:text="${routineSettingDto.dailyLimitView}"></td>
                 <td class="col-hide-sm" th:text="${routineSettingDto.daysOfWeekView}"></td>
@@ -566,9 +571,15 @@
         const empty = document.getElementById('emptyMessageRow');
         if (empty) empty.remove();
         const tr = document.createElement('tr');
+        // ⚠️ 아래 행 구조는 위쪽 Thymeleaf 목록(등록된 루틴 리스트)의 <tr>과 반드시 동일하게 유지할 것.
+        //    한쪽만 고치면 새로 추가한 행만 모양이 달라진다.
         tr.innerHTML = `
-            <td>${data.title}</td>
-            <td><span class="type-badge">${typeLabel(data.routineType)}</span></td>
+            <td>
+                <span class="routine-name">${data.title}</span>
+                <span class="row-sub">${convertToDays(data.daysOfWeek)}</span>
+                <span class="row-sub">${data.startYmd}</span>
+            </td>
+            <td class="col-hide-sm"><span class="type-badge">${typeLabel(data.routineType)}</span></td>
             <td>${formatGoal(data.routineType, data.targetValue)}</td>
             <td>${data.dailyLimit ? formatGoal(data.routineType, data.dailyLimit) : '-'}</td>
             <td class="col-hide-sm">${convertToDays(data.daysOfWeek)}</td>
@@ -778,6 +789,7 @@
         }
     }
 
+    // ⚠️ RoutineType enum 의 label 값과 반드시 일치시킬 것 (한쪽만 바꾸면 새로고침 전후 표기가 달라진다)
     function typeLabel(t) { return { CHECK:'체크형', COUNT:'누적형', TIME:'시간', KM:'km' }[t] || t; }
     function formatGoal(type, value) {
         if (type === 'CHECK' || type === 'COUNT') return value + '회';
