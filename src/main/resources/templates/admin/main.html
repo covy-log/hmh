@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 페이지</title>
+    <!-- 공통 푸터가 다른 페이지와 동일하게 보이도록 공용 스타일시트를 참조한다 -->
+    <link rel="stylesheet" th:href="@{/css/routine.css}" href="/css/routine.css">
 </head>
 <body>
 
-<h1>관리자 페이지</h1>
-<p>데몬 수동 실행, 실행 로그 조회 등은 추후 추가 예정입니다.</p>
-<a href="/dailyLog">일일 루틴으로 돌아가기</a>
+<div class="page-wrapper">
+    <h1>관리자 페이지</h1>
+    <p>데몬 수동 실행, 실행 로그 조회 등은 추후 추가 예정입니다.</p>
+    <a href="/dailyLog">일일 루틴으로 돌아가기</a>
+</div>
+
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 
 </body>
 </html>

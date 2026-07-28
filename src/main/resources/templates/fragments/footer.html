@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+
+<!--
+  모든 페이지 공통 하단 문구.
+  사용법: 각 템플릿의 </body> 직전에 아래 한 줄을 넣는다.
+      <div th:replace="~{fragments/footer :: siteFooter}"></div>
+
+  ⚠️ 오픈 채팅 주소는 여기 한 곳만 고치면 전체 페이지에 반영된다.
+-->
+<footer class="site-footer" th:fragment="siteFooter">
+    <span class="site-footer-text">오류 문의 및 건의 사항은 오픈 채팅을 이용해 주세요.</span>
+    <a class="site-footer-link"
+       href="https://open.kakao.com/o/pLvmbaGi"
+       target="_blank"
+       rel="noopener noreferrer">https://open.kakao.com/o/pLvmbaGi</a>
+</footer>
+
+</body>
+</html>

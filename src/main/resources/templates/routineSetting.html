@@ -62,17 +62,17 @@
             <div class="field-content">
                 <div class="days-row">
                     <label class="day-chip any-day">
-                        <input type="checkbox" id="checkAnyDay" onchange="onAnyDayChange()" checked>
+                        <input type="checkbox" id="checkAnyDay" onchange="onAnyDayChange()">
                         매일
                     </label>
                     <span class="sep"></span>
-                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="1" onchange="onDayCheckboxChange()" checked>월</label>
-                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="2" onchange="onDayCheckboxChange()" checked>화</label>
-                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="3" onchange="onDayCheckboxChange()" checked>수</label>
-                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="4" onchange="onDayCheckboxChange()" checked>목</label>
-                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="5" onchange="onDayCheckboxChange()" checked>금</label>
-                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="6" onchange="onDayCheckboxChange()" checked>토</label>
-                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="7" onchange="onDayCheckboxChange()" checked>일</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="1" onchange="onDayCheckboxChange()">월</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="2" onchange="onDayCheckboxChange()">화</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="3" onchange="onDayCheckboxChange()">수</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="4" onchange="onDayCheckboxChange()">목</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="5" onchange="onDayCheckboxChange()">금</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="6" onchange="onDayCheckboxChange()">토</label>
+                    <label class="day-chip"><input type="checkbox" class="day-checkbox" value="7" onchange="onDayCheckboxChange()">일</label>
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@
                 <div id="goal-CHECK" class="goal-block visible">
                     <div class="goal-main">
                         <input type="number" id="checkGoal" min="1" value="1">
-                        <span class="unit">회 / 주</span>
+                        <span class="unit">회</span>
                         <span class="check-max-hint" id="checkMaxHint">(최대 7회)</span>
                     </div>
                     <div class="error-msg" id="checkGoalError">선택한 요일 수를 초과할 수 없어요.</div>
@@ -121,7 +121,7 @@
                 <div id="goal-COUNT" class="goal-block">
                     <div class="goal-main">
                         <input type="number" id="countGoal" min="1" value="10">
-                        <span class="unit">회 / 주</span>
+                        <span class="unit">회</span>
                         <button type="button" class="toggle-limit-btn" onclick="toggleLimit('COUNT')">1일 최대 한도 설정</button>
                     </div>
                     <div class="daily-limit-area" id="limit-COUNT">
@@ -138,7 +138,7 @@
                         <input type="number" class="input-sm" id="timeGoalHour" min="0" value="1">
                         <span class="unit">시간</span>
                         <input type="number" class="input-sm" id="timeGoalMin" min="0" max="59" value="0">
-                        <span class="unit">분 / 주</span>
+                        <span class="unit">분</span>
                         <button type="button" class="toggle-limit-btn" onclick="toggleLimit('TIME')">1일 최대 한도 설정</button>
                     </div>
                     <div class="daily-limit-area" id="limit-TIME">
@@ -155,7 +155,7 @@
                 <div id="goal-KM" class="goal-block">
                     <div class="goal-main">
                         <input type="number" id="distGoal" min="0.01" step="0.01" value="5.00" style="width:90px;">
-                        <span class="unit">km / 주</span>
+                        <span class="unit">km</span>
                         <button type="button" class="toggle-limit-btn" onclick="toggleLimit('KM')">1일 최대 한도 설정</button>
                     </div>
                     <div class="daily-limit-area" id="limit-KM">
@@ -280,7 +280,7 @@
             <div id="edit-goal-CHECK" class="goal-block">
                 <div class="goal-main">
                     <input type="number" id="editCheckGoal" min="1" value="1">
-                    <span class="unit">회 / 주</span>
+                    <span class="unit">회</span>
                     <span class="check-max-hint" id="editCheckMaxHint"></span>
                 </div>
                 <div class="error-msg" id="editCheckGoalError">선택한 요일 수를 초과할 수 없어요.</div>
@@ -290,7 +290,7 @@
             <div id="edit-goal-COUNT" class="goal-block">
                 <div class="goal-main">
                     <input type="number" id="editCountGoal" min="1" value="10">
-                    <span class="unit">회 / 주</span>
+                    <span class="unit">회</span>
                     <button type="button" class="toggle-limit-btn" onclick="toggleEditLimit('COUNT')">1일 최대 한도 설정</button>
                 </div>
                 <div class="daily-limit-area" id="edit-limit-COUNT">
@@ -307,7 +307,7 @@
                     <input type="number" class="input-sm" id="editTimeGoalHour" min="0" value="1">
                     <span class="unit">시간</span>
                     <input type="number" class="input-sm" id="editTimeGoalMin" min="0" max="59" value="0">
-                    <span class="unit">분 / 주</span>
+                    <span class="unit">분</span>
                     <button type="button" class="toggle-limit-btn" onclick="toggleEditLimit('TIME')">1일 최대 한도 설정</button>
                 </div>
                 <div class="daily-limit-area" id="edit-limit-TIME">
@@ -324,7 +324,7 @@
             <div id="edit-goal-KM" class="goal-block">
                 <div class="goal-main">
                     <input type="number" id="editDistGoal" min="0.01" step="0.01" value="5.00" style="width:90px;">
-                    <span class="unit">km / 주</span>
+                    <span class="unit">km</span>
                     <button type="button" class="toggle-limit-btn" onclick="toggleEditLimit('KM')">1일 최대 한도 설정</button>
                 </div>
                 <div class="daily-limit-area" id="edit-limit-KM">
@@ -390,6 +390,7 @@
     });
 
     async function logout() {
+        if (!(await showConfirm('정말로 로그아웃 할거야?'))) return;
         await fetch('/api/members/logout', { method: 'POST' });
         window.location.href = '/login';
     }
@@ -450,7 +451,8 @@
         document.getElementById('checkMaxHint').textContent = '(최대 ' + cnt + '회)';
         const input = document.getElementById('checkGoal');
         input.max = cnt;
-        if (parseInt(input.value) > cnt) input.value = cnt;
+        // 요일 미선택(cnt=0)일 때는 목표 값을 0으로 깎지 않는다 — 저장 시 요일 검증이 먼저 걸린다
+        if (cnt > 0 && parseInt(input.value) > cnt) input.value = cnt;
     }
 
     // ─── 한도 토글 ───────────────────────────────
@@ -557,8 +559,8 @@
     // ─── 폼 초기화 ───────────────────────────────
     function resetForm() {
         document.getElementById('title').value = '';
-        document.getElementById('checkAnyDay').checked = true;
-        onAnyDayChange();
+        document.getElementById('checkAnyDay').checked = false;
+        onAnyDayChange(); // 전체 해제 — 요일은 기본 미선택 상태로 되돌린다
         document.querySelector('input[name="routineType"][value="CHECK"]').checked = true;
         onTypeChange();
         resetStartYmdToThisWeek();
@@ -923,6 +925,8 @@
         }
     }
 </script>
+
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 
 </body>
 </html>

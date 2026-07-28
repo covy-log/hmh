@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,8 @@
     <style>
         /* 로그인 페이지 전용 스타일 */
         .auth-container {
-            min-height: 100vh;
+            /* 하단 공통 푸터가 화면 밖으로 밀리지 않도록 푸터 높이만큼 뺀다 */
+            min-height: calc(100vh - 96px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -250,5 +251,8 @@
             input.addEventListener('input', () => input.classList.remove('input-error'));
         });
     </script>
+
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
+
 </body>
 </html>

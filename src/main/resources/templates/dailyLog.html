@@ -67,7 +67,7 @@
         <table class="routine-table">
             <thead>
             <tr>
-                <th class="check-cell">상태</th>
+                <th class="check-cell">완료</th>
                 <th>루틴명</th>
                 <th class="value-cell">달성 수치</th>
             </tr>
@@ -202,6 +202,7 @@
     });
 
     async function logout() {
+        if (!(await showConfirm('정말로 로그아웃 할거야?'))) return;
         await fetch('/api/members/logout', { method: 'POST' });
         window.location.href = '/login';
     }
@@ -317,6 +318,8 @@
         document.getElementById('achievementRateView').innerText  = rate + '%';
     }
 </script>
+
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 
 </body>
 </html>

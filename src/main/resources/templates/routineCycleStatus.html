@@ -100,7 +100,7 @@
                 <th>날짜</th>
                 <th>루틴명</th>
                 <th>수행 결과</th>
-                <th class="status-cell">상태</th>
+                <th class="status-cell">수행여부</th>
             </tr>
             </thead>
             <tbody>
@@ -128,8 +128,8 @@
                 </td>
 
                 <td class="status-cell">
-                    <span th:if="${history.success}" class="status-badge success">성공</span>
-                    <span th:unless="${history.success}" class="status-badge fail">미달</span>
+                    <span th:if="${history.success}" class="status-badge success">수행</span>
+                    <span th:unless="${history.success}" class="status-badge fail">실패</span>
                 </td>
             </tr>
 
@@ -184,6 +184,7 @@
     });
 
     async function logout() {
+        if (!(await showConfirm('정말로 로그아웃 할거야?'))) return;
         await fetch('/api/members/logout', { method: 'POST' });
         window.location.href = '/login';
     }
@@ -203,6 +204,8 @@
         }
     }
 </script>
+
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 
 </body>
 </html>

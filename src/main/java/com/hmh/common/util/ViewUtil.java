@@ -63,6 +63,8 @@ public class ViewUtil {
         int min = mm % 60;
         if (min > 0) sb.append(min + Const.UNIT_MINUTE);
 
+        // 0분이면 위 두 조건이 모두 거짓이라 빈 문자열이 되어 화면에 아무것도 안 보인다 → "0분"으로 표기
+        if (sb.length() == 0) sb.append(0).append(Const.UNIT_MINUTE);
 
         return sb.toString();
     }

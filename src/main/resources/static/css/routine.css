@@ -27,6 +27,10 @@
     --accent-light: #f4ece3;
     --accent-glow:  rgba(140, 94, 60, 0.18);
 
+    /* 선택된 칩(수행 요일·루틴 타입·1일 최대 한도)의 글자색.
+       라이트 테마는 배경이 밝아 accent 색 그대로도 잘 읽힌다. */
+    --chip-active-text: #8c5e3c;
+
     --success:        #5a8a5e;
     --success-light:  #edf5ee;
     --danger:         #c0392b;
@@ -93,6 +97,9 @@
         --accent-light: #0A261A;
         --accent-glow:  rgba(24, 154, 96, 0.25);
 
+        /* 다크 테마는 배경이 짙은 초록이라 accent 글자색이 묻힌다 → 흰색으로 */
+        --chip-active-text: #ffffff;
+
         --success:        #19c37d;
         --success-light:  #0a2018;
         --danger:         #f04452;
@@ -105,6 +112,9 @@
 
 /* 수동 다크 강제 */
 html[data-theme="dark"] {
+    /* 다크 테마는 배경이 짙은 초록이라 accent 글자색이 묻힌다 → 흰색으로 */
+    --chip-active-text: #ffffff;
+
     --bg:          #000000;
     --surface:     #111111;
     --surface-sub: #1a1a1a;
@@ -142,6 +152,10 @@ html[data-theme="light"] {
     --accent-hover: #7a4f30;
     --accent-light: #f4ece3;
     --accent-glow:  rgba(140, 94, 60, 0.18);
+
+    /* 선택된 칩(수행 요일·루틴 타입·1일 최대 한도)의 글자색.
+       라이트 테마는 배경이 밝아 accent 색 그대로도 잘 읽힌다. */
+    --chip-active-text: #8c5e3c;
     --success:        #5a8a5e;
     --success-light:  #edf5ee;
     --danger:         #c0392b;
@@ -628,7 +642,7 @@ input.form-input.input-error { border-color: #e5484d; }
 .day-chip:has(input:checked) {
     border-color: var(--accent);
     background: var(--accent-light);
-    color: var(--accent);
+    color: var(--chip-active-text);
     font-weight: 600;
 }
 .day-chip.any-day { font-weight: 600; }
@@ -656,13 +670,13 @@ input.form-input.input-error { border-color: #e5484d; }
 .type-chip:has(input:checked) {
     border-color: var(--accent);
     background: var(--accent-light);
-    color: var(--accent);
+    color: var(--chip-active-text);
     font-weight: 600;
     box-shadow: 0 0 0 1px var(--accent);
 }
 .type-chip input { display: none; }
 .type-chip small { font-size: 11px; color: var(--text-hint); font-weight: 400; }
-.type-chip:has(input:checked) small { color: var(--accent); opacity: 0.75; }
+.type-chip:has(input:checked) small { color: var(--chip-active-text); opacity: 0.75; }
 
 /* ══════════════════════════════════════════════
    Goal Block
@@ -687,7 +701,7 @@ input.form-input.input-error { border-color: #e5484d; }
     transition: all var(--transition);
     margin-left: 4px;
 }
-.toggle-limit-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.toggle-limit-btn:hover { border-color: var(--accent); color: var(--chip-active-text); background: var(--accent-light); }
 
 .daily-limit-area {
     display: none;
@@ -1143,6 +1157,31 @@ input.form-input.input-error { border-color: #e5484d; }
    Divider
 ══════════════════════════════════════════════ */
 .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+/* ══════════════════════════════════════════════
+   Site Footer (fragments/footer.html — 전 페이지 공통)
+══════════════════════════════════════════════ */
+.site-footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 0 4px;
+    border-top: 1px solid var(--border-soft);
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-hint);
+}
+.site-footer-text { display: block; }
+.site-footer-link {
+    color: var(--accent);
+    text-decoration: none;
+    word-break: break-all; /* 긴 주소가 좁은 화면에서 넘치지 않도록 */
+    transition: color var(--transition);
+}
+.site-footer-link:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
 
 /* ══════════════════════════════════════════════
    Responsive
