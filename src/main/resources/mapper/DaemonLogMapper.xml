@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hmh.repository.DaemonLogMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="seqNo" keyColumn="seq_no">
+        INSERT INTO daemon_log
+        (daemon_name, start_dt, status)
+        VALUES (#{daemonName}, #{startDt}, #{status})
+    </insert>
+
+    <update id="update" parameterType="DaemonLog">
+        UPDATE daemon_log
+        SET end_dt = #{endDt},
+            success_count = #{successCount},
+            fail_count = #{failCount},
+            status = #{status},
+            err_msg = #{errMsg}
+        WHERE seq_no = #{seqNo}
+    </update>
+
+</mapper>
