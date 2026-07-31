@@ -83,4 +83,12 @@
         AND member_seq_no = #{memberSeqNo}
         AND status = 'TODO'
     </update>
+
+    <select id="existsByCycleSeqNoAndTodoYmd" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM daily_log
+            WHERE cycle_seq_no = #{cycleSeqNo}
+            AND todo_ymd = #{todoYmd}
+        )
+    </select>
 </mapper>

@@ -49,6 +49,14 @@ public class DaemonRoutineCycleService {
             for (Routine routine : routineList) {
                 try {
                     Optional<RoutineCycle> latestCycle = routineCycleMapper.findLatestByRoutineSeqNo(routine.getSeqNo());
+
+                    // 이미 이번 주(오늘 기준) 사이클이 만들어져 있으면 중복 생성하지 않는다
+                    // (데몬 중복 실행 대비, 기존 사이클은 절대 건드리지 않음)
+                    if (latestCycle.isPresent() && !latestCycle.get().getStartYmd().isBefore(today)) {
+                        successCount++;
+                        continue;
+                    }
+
                     latestCycle.ifPresent(cycle -> closeCycleIfEnded(cycle, today));
 
                     int cycleNumber = latestCycle.map(cycle -> cycle.getCycleNumber() + 1).orElse(1);

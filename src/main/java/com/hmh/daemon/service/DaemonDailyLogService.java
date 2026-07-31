@@ -64,8 +64,16 @@ public class DaemonDailyLogService {
                             continue;
                         }
 
+                        Long cycleSeqNo = currentCycle.get().getSeqNo();
+
+                        // 이미 오늘자 DailyLog가 있으면 중복 생성하지 않는다 (데몬 중복 실행 대비, 기존 기록은 절대 건드리지 않음)
+                        if (dailyLogMapper.existsByCycleSeqNoAndTodoYmd(cycleSeqNo, today)) {
+                            successCount++;
+                            continue;
+                        }
+
                         DailyLog dailyLog = DailyLog.builder()
-                                .cycleSeqNo(currentCycle.get().getSeqNo())
+                                .cycleSeqNo(cycleSeqNo)
                                 .memberSeqNo(routine.getMemberSeqNo())
                                 .todoYmd(today)
                                 .build();

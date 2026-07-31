@@ -68,4 +68,13 @@ public interface DailyLogMapper {
      * @param memberSeqNo 회원 고유번호 (본인 데이터만 처리되도록 제한)
      */
     void cancelByRoutineSeqNo(@Param("routineSeqNo") Long routineSeqNo, @Param("memberSeqNo") Long memberSeqNo);
+
+    /**
+     * 해당 사이클의 해당 날짜 일일 기록이 이미 존재하는지 확인
+     * (데몬 중복 실행 시 같은 daily_log를 또 만들지 않기 위한 확인용)
+     * @param cycleSeqNo 사이클 고유번호
+     * @param todoYmd 확인할 날짜
+     * @return 이미 존재하면 true
+     */
+    boolean existsByCycleSeqNoAndTodoYmd(@Param("cycleSeqNo") Long cycleSeqNo, @Param("todoYmd") LocalDate todoYmd);
 }
