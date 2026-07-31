@@ -55,7 +55,7 @@ public class ViewController {
             return "member/login";
         }
 
-        return "dailyLog";
+        return "redirect:/dailyLog";
     }
 
     /**
