@@ -19,45 +19,61 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DaemonRoutineCycleService {
 
+    private static final String DAEMON_NAME = "RoutineCycleDaemon";
+
     private final RoutineMapper routineMapper;
     private final RoutineCycleMapper routineCycleMapper;
+    private final DaemonLogService daemonLogService;
 
     /**
      * 주간 루틴 사이클 생성
      */
     public void createWeeklyCycle() {
-        LocalDate today = LocalDate.now();
+        Long daemonLogSeqNo = daemonLogService.start(DAEMON_NAME);
+        int successCount = 0;
+        int failCount = 0;
+        StringBuilder errMsgBuilder = new StringBuilder();
 
-        if (today.getDayOfWeek() != DayOfWeek.MONDAY) {
-            return;
-        }
+        try {
+            LocalDate today = LocalDate.now();
 
-        Routine routineParam = new Routine();
-        routineParam.setStatus(RoutineStatus.IN_PROGRESS);
-        routineParam.setStartYmd(today);
-        List<Routine> routineList = routineMapper.findAllByInProgress(routineParam);
-
-        for (Routine routine : routineList) {
-            try {
-                Optional<RoutineCycle> latestCycle = routineCycleMapper.findLatestByRoutineSeqNo(routine.getSeqNo());
-                latestCycle.ifPresent(cycle -> closeCycleIfEnded(cycle, today));
-
-                int cycleNumber = latestCycle.map(cycle -> cycle.getCycleNumber() + 1).orElse(1);
-
-                RoutineCycle newCycle = RoutineCycle.builder()
-                        .routineSeqNo(routine.getSeqNo())
-                        .memberSeqNo(routine.getMemberSeqNo())
-                        .cycleNumber(cycleNumber)
-                        .startYmd(today)
-                        .endYmd(today.plusDays(6))
-                        .targetValue(routine.getTargetValue())
-                        .dailyLimit(routine.getDailyLimit())
-                        .build();
-
-                routineCycleMapper.save(newCycle);
-            } catch (Exception e) {
-                log.error("루틴(seqNo={}) 사이클 생성 중 오류가 발생했습니다.", routine.getSeqNo(), e);
+            if (today.getDayOfWeek() != DayOfWeek.MONDAY) {
+                return;
             }
+
+            Routine routineParam = new Routine();
+            routineParam.setStatus(RoutineStatus.IN_PROGRESS);
+            routineParam.setStartYmd(today);
+            List<Routine> routineList = routineMapper.findAllByInProgress(routineParam);
+
+            for (Routine routine : routineList) {
+                try {
+                    Optional<RoutineCycle> latestCycle = routineCycleMapper.findLatestByRoutineSeqNo(routine.getSeqNo());
+                    latestCycle.ifPresent(cycle -> closeCycleIfEnded(cycle, today));
+
+                    int cycleNumber = latestCycle.map(cycle -> cycle.getCycleNumber() + 1).orElse(1);
+
+                    RoutineCycle newCycle = RoutineCycle.builder()
+                            .routineSeqNo(routine.getSeqNo())
+                            .memberSeqNo(routine.getMemberSeqNo())
+                            .cycleNumber(cycleNumber)
+                            .startYmd(today)
+                            .endYmd(today.plusDays(6))
+                            .targetValue(routine.getTargetValue())
+                            .dailyLimit(routine.getDailyLimit())
+                            .build();
+
+                    routineCycleMapper.save(newCycle);
+                    successCount++;
+                } catch (Exception e) {
+                    failCount++;
+                    errMsgBuilder.append("[").append(routine.getSeqNo()).append("] ").append(e.getMessage()).append("\n");
+                    log.error("루틴(seqNo={}) 사이클 생성 중 오류가 발생했습니다.", routine.getSeqNo(), e);
+                }
+            }
+        } finally {
+            daemonLogService.finish(daemonLogSeqNo, successCount, failCount,
+                    errMsgBuilder.length() > 0 ? errMsgBuilder.toString() : null);
         }
     }
 

@@ -551,7 +551,7 @@
             if (response.ok) {
                 const seqNo = await response.text(); // 서버가 생성된 루틴 seqNo 반환
                 addRoutineToList(requestData, seqNo);
-                showAlert('루틴이 등록됐어!');
+                showAlert('루틴이 등록됐어요.');
                 resetForm();
             }
             else showAlert('등록에 실패했어. 다시 시도해 봐.');
@@ -604,7 +604,7 @@
 
     // ─── 루틴 삭제 ────────────────────────────────
     async function deleteRoutine(seqNo, btn) {
-        if (!(await showConfirm('이 루틴을 삭제할까요?\n진행 중인 이번 주 사이클과 아직 안 한 일일 루틴도 함께 취소돼요.'))) return;
+        if (!(await showConfirm('루틴을 삭제할까요?\n진행 중인 이번 주 현황도 함께 취소돼요.'))) return;
         try {
             const response = await fetch('/api/routine/' + seqNo, { method: 'DELETE' });
             if (!response.ok) throw new Error('삭제 실패');
@@ -626,6 +626,8 @@
                     </td>`;
                 tbody.appendChild(emptyRow);
             }
+
+            showAlert('루틴이 삭제됐어요.');
         } catch (e) {
             console.error(e);
             showAlert('삭제에 실패했어. 다시 시도해 봐.');
